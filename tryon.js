@@ -19,7 +19,7 @@ const MODEL = "https://storage.googleapis.com/mediapipe-models/face_landmarker/f
 const TUNE = {
   fovY: 63, near: 1, far: 2000, exposure: 1.3, envIntensity: 1.6,
   widthK: 1.5, ox: 0, oy: 0, oz: 0.6,
-  templeSplayBase: 0.55, templeSplayK: 1, templeSign: 1, templeSplayMax: 1.1,
+  templeSplayBase: 0.26, templeSplayK: 1, templeSign: 1, templeSplayMax: 0.9,
   templeFadeStart: -0.045, templeFadeEnd: -0.12
 };
 const BRIDGE = 168, R_EYE = 33, L_EYE = 263, R_TEMPLE = 234, L_TEMPLE = 454;
@@ -119,7 +119,9 @@ async function loadModel(url) {
   root.updateWorldMatrix(true, true);
   const hinges = [];
   root.traverse(o => {
-    if (/temple_hinge/i.test(o.name)) {
+    // The temple arm root pivots around the hinge (its origin sits at the
+    // hinge). Its *_hinge / *_sub children are just parts of the arm.
+    if (/^(left|right)_temple$/i.test(o.name)) {
       const wx = new THREE.Vector3().setFromMatrixPosition(o.matrixWorld).x;
       hinges.push({ node: o, baseY: o.rotation.y, side: Math.sign(wx) || 1 });
     }
