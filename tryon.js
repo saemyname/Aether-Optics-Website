@@ -19,16 +19,19 @@ const MODEL = "https://storage.googleapis.com/mediapipe-models/face_landmarker/f
 const TUNE = {
   fovY: 63, near: 1, far: 2000,
   widthK: 1.5, ox: 0, oy: 0, oz: 0.6,
+  templeSplayK: 1, templeSign: 1, templeSplayMax: 0.4,
   templeFadeStart: -0.045, templeFadeEnd: -0.12
 };
-const BRIDGE = 168, R_EYE = 33, L_EYE = 263;
+const BRIDGE = 168, R_EYE = 33, L_EYE = 263, R_TEMPLE = 234, L_TEMPLE = 454;
 
 /* ---------- shared engine ---------- */
 let landmarker = null, stream = null, raf = null, lastTs = -1;
-let three = null, mountEl = null, currentModelUrl = null, currentWidth = 0.134;
+let three = null, mountEl = null, currentModelUrl = null;
+let currentWidth = 0.134, currentDepth = 0.135, currentHinges = [];
 const modelCache = new Map();
 const _m = new THREE.Matrix4(), _p = new THREE.Vector3(), _q = new THREE.Quaternion(), _s = new THREE.Vector3();
 const _pos = new THREE.Vector3(), _e1 = new THREE.Vector3(), _e2 = new THREE.Vector3(), _off = new THREE.Vector3();
+const _t1 = new THREE.Vector3(), _t2 = new THREE.Vector3();
 
 async function ensureModel() {
   if (landmarker) return;
@@ -110,8 +113,16 @@ async function loadModel(url) {
   const gltf = await three.loader.loadAsync(url);
   const root = gltf.scene;
   applyTempleFade(root);
+  root.updateWorldMatrix(true, true);
+  const hinges = [];
+  root.traverse(o => {
+    if (/temple_hinge/i.test(o.name)) {
+      const wx = new THREE.Vector3().setFromMatrixPosition(o.matrixWorld).x;
+      hinges.push({ node: o, baseY: o.rotation.y, side: Math.sign(wx) || 1 });
+    }
+  });
   const box = new THREE.Box3().setFromObject(root);
-  const entry = { root, width: box.max.x - box.min.x }; // native model width (metres)
+  const entry = { root, width: box.max.x - box.min.x, depth: box.max.z - box.min.z, hinges };
   modelCache.set(url, entry);
   return entry;
 }
@@ -124,7 +135,7 @@ async function setModel(url) {
   const g = t.glassesRoot;
   while (g.children.length) g.remove(g.children[0]);
   g.add(entry.root);
-  currentWidth = entry.width;
+  currentWidth = entry.width; currentDepth = entry.depth; currentHinges = entry.hinges;
 }
 
 /* Anchor the frame to the eyes: nose-bridge position, outer-eye-corner scale,
@@ -146,6 +157,18 @@ function placeGlasses(lm, mtxData) {
   g.scale.setScalar(scale);
   _off.set(TUNE.ox, TUNE.oy, TUNE.oz).applyQuaternion(_q);
   g.position.copy(_pos).add(_off);
+
+  // Splay the temple arms outward to the head width so they hug the sides of
+  // the face instead of clipping through it (real hinges opening wider).
+  if (currentHinges.length) {
+    toWorld(lm[R_TEMPLE].x, lm[R_TEMPLE].y, _t1);
+    toWorld(lm[L_TEMPLE].x, lm[L_TEMPLE].y, _t2);
+    const faceW = _t1.distanceTo(_t2), frameW = currentWidth * scale, templeLen = currentDepth * scale;
+    let splay = 0;
+    if (faceW > frameW && templeLen > 0) splay = Math.asin(Math.min(1, (faceW - frameW) / 2 / templeLen));
+    splay = Math.min(splay, TUNE.templeSplayMax) * TUNE.templeSplayK;
+    for (const h of currentHinges) h.node.rotation.y = h.baseY - h.side * splay * TUNE.templeSign;
+  }
 }
 
 function sizeToVideo() {
