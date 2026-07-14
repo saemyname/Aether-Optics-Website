@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shop all frames — Aether NY</title>
+<meta name="description" content="Shop Aether NY eyeglasses and sunglasses. Handmade acetate frames, try them on in AR before you buy.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="nav">
+  <a class="brand" href="index.html">Aether <b>NY</b></a>
+  <nav class="nav-links">
+    <a href="shop.html" class="active">Eyeglasses</a>
+    <a href="shop.html#sun">Sunglasses</a>
+    <a href="index.html#tryon">Virtual Try-On</a>
+    <a href="index.html#story">Our Story</a>
+  </nav>
+  <div class="nav-cta"><a class="link-arrow" href="index.html">Home <span>→</span></a><button class="nav-toggle" aria-label="Menu">☰</button></div>
+</header>
+
+<main class="wrap" style="padding-top:clamp(2.5rem,5vw,4.5rem);padding-bottom:2rem">
+  <div class="section-head">
+    <div>
+      <span class="eyebrow accent">The Collection</span>
+      <h1 class="display" style="font-size:clamp(2.4rem,6vw,4.4rem)">All frames</h1>
+    </div>
+    <p class="lede" id="count" style="max-width:22ch;text-align:right"></p>
+  </div>
+  <div class="filter-bar" id="filters">
+    <button class="chip on" data-f="all">All</button>
+    <button class="chip" data-f="eyeglasses">Eyeglasses</button>
+    <button class="chip" data-f="sunglasses">Sunglasses</button>
+  </div>
+  <div class="grid shop" id="shopGrid"></div>
+</main>
+
+<footer class="footer">
+  <div class="wrap">
+    <p class="eyebrow" style="color:var(--cognac);margin-bottom:1.2rem">Aether NY</p>
+    <p class="display">See them<br>on <em>you.</em></p>
+    <div class="footer-grid">
+      <div class="footer-col"><h4>Aether NY</h4><p style="color:rgba(246,243,237,.6);font-size:.92rem;max-width:34ch">Independent optical, made by hand and seen on your face. New York City.</p></div>
+      <div class="footer-col"><h4>Shop</h4><a href="shop.html">All frames</a><a href="index.html#tryon">Virtual try-on</a></div>
+      <div class="footer-col"><h4>Company</h4><a href="index.html#story">Our story</a><a href="#">Returns</a></div>
+    </div>
+    <div class="footer-fine"><span>© 2026 Aether NY. A portfolio concept.</span><span>Try-on · Handmade acetate · Free returns</span></div>
+  </div>
+</footer>
+
+<script src="data.js"></script>
+<script src="main.js"></script>
+<script>
+(function () {
+  const grid = document.querySelector('#shopGrid');
+  const count = document.querySelector('#count');
+  const chips = Array.from(document.querySelectorAll('#filters .chip'));
+  function render(f) {
+    const list = f === 'all' ? CATALOG : CATALOG.filter(i => i.type === f);
+    grid.innerHTML = list.map(window.AETHER.card).join('');
+    count.textContent = list.length + ' frames, ready to try on';
+  }
+  chips.forEach(c => c.addEventListener('click', () => {
+    chips.forEach(x => x.classList.toggle('on', x === c));
+    render(c.dataset.f);
+  }));
+  // deep-link #sun → sunglasses
+  const start = location.hash === '#sun' ? 'sunglasses' : 'all';
+  chips.forEach(x => x.classList.toggle('on', x.dataset.f === start));
+  render(start);
+})();
+</script>
+</body>
+</html>

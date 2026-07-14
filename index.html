@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aether NY — Eyewear, seen on you</title>
+<meta name="description" content="Independent optical from Aether NY. Try every frame on your own face in AR, then have it delivered. Eyeglasses and sunglasses, handmade acetate.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="nav">
+  <a class="brand" href="index.html">Aether <b>NY</b></a>
+  <nav class="nav-links">
+    <a href="shop.html">Eyeglasses</a>
+    <a href="shop.html#sun">Sunglasses</a>
+    <a href="index.html#tryon">Virtual Try-On</a>
+    <a href="index.html#story">Our Story</a>
+  </nav>
+  <div class="nav-cta">
+    <a class="link-arrow" href="shop.html">Shop all <span>→</span></a>
+    <button class="nav-toggle" aria-label="Menu">☰</button>
+  </div>
+</header>
+
+<main>
+  <!-- HERO -->
+  <section class="hero wrap">
+    <div class="hero-grid">
+      <div class="hero-copy">
+        <span class="eyebrow accent">Optical, independent · New York</span>
+        <h1 class="display">Eyewear,<br>seen <em>on you.</em></h1>
+        <p class="lede">Hand-finished acetate frames you can try on your own face before they arrive — no guesswork, no waiting room.</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="shop.html">Shop the collection</a>
+          <a class="btn btn-ghost" href="#tryon">See the try-on ↓</a>
+        </div>
+      </div>
+      <div class="hero-stage">
+        <span class="hero-tag tl">Cicely — Lavender Tortoise</span>
+        <img class="hero-frame" src="assets/frames/cicely-lavender.png" alt="Cicely eyeglasses in lavender tortoise acetate">
+        <span class="hero-tag br">$170 · Cat-eye</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- MARQUEE -->
+  <div class="marquee-strip" aria-hidden="true">
+    <div class="marquee-track">
+      <span>Handmade acetate</span><span>Try before you buy</span><span>Prescription ready</span><span>Free returns</span>
+      <span>Handmade acetate</span><span>Try before you buy</span><span>Prescription ready</span><span>Free returns</span>
+    </div>
+  </div>
+
+  <!-- TRY-ON SIGNATURE -->
+  <section class="tryon" id="tryon">
+    <div class="wrap tryon-grid">
+      <div class="tryon-copy reveal">
+        <span class="eyebrow">The Aether app</span>
+        <h2>Every frame,<br>on your face.</h2>
+        <p class="lede">Point your camera and the frames settle onto your face in true scale — turn your head, catch the light, see the fit. It’s the fitting room, wherever you are.</p>
+        <ol class="tryon-steps">
+          <li><span class="num">01</span><div><b>Open the camera</b><p>Face tracking finds your eyes and bridge.</p></div></li>
+          <li><span class="num">02</span><div><b>Tap through frames</b><p>Each pair lands in true millimetre scale.</p></div></li>
+          <li><span class="num">03</span><div><b>Capture your look</b><p>Save the shot, share it, add to bag.</p></div></li>
+        </ol>
+        <a class="btn btn-light" href="#">Get the app</a>
+      </div>
+      <div class="tryon-view reveal">
+        <div class="viewport" id="viewport">
+          <svg class="face" viewBox="0 0 200 240" fill="none" aria-hidden="true"><ellipse cx="100" cy="120" rx="72" ry="96" stroke="#F6F3ED" stroke-width="2"/><path d="M100 150c-14 0-22-8-22-8M62 96c8-6 18-6 24 0M114 96c8-6 18-6 24 0" stroke="#F6F3ED" stroke-width="2" stroke-linecap="round"/></svg>
+          <img class="vp-frame" id="vpFrame" src="assets/frames/carson-chai.png" alt="Frame previewed on face">
+          <div class="scanline"></div>
+          <div class="vp-dots" id="vpDots"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COLLECTION -->
+  <section class="story wrap" id="collection" style="padding-bottom:0">
+    <div class="section-head">
+      <div>
+        <span class="eyebrow accent">The Collection</span>
+        <h2>Frames worth keeping.</h2>
+      </div>
+      <a class="link-arrow" href="shop.html">View all 13 <span>→</span></a>
+    </div>
+    <div class="grid" id="collectionGrid"></div>
+  </section>
+
+  <!-- STORY -->
+  <section class="story wrap" id="story">
+    <div class="story-grid">
+      <div class="reveal">
+        <span class="eyebrow accent">Our story</span>
+        <h2 class="display">Made by opticians,<br>not algorithms.</h2>
+        <div class="story-cols">
+          <p>Aether NY began in a small workshop with a stubborn idea: that buying glasses online shouldn’t mean guessing. Every frame is cut from Italian acetate, tumbled for a week to a soft shine, and finished by hand.</p>
+          <p>&nbsp;</p>
+          <p>The try-on came later — our answer to the fitting-room problem. Measure once, see everything, and only order the pair that’s truly yours.</p>
+        </div>
+      </div>
+      <div class="reveal">
+        <ul class="spec-list">
+          <li><span class="k">Material</span><span>Italian cellulose acetate</span></li>
+          <li><span class="k">Lenses</span><span>Anti-reflective, prescription-ready</span></li>
+          <li><span class="k">Fit range</span><span>Narrow · Medium · Wide</span></li>
+          <li><span class="k">Try-on</span><span>AR, true millimetre scale</span></li>
+          <li><span class="k">Returns</span><span>Free, within 30 days</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- PLEDGE -->
+  <section class="pledge">
+    <div class="wrap pledge-grid">
+      <div class="pledge-item reveal"><span class="eyebrow">Fit</span><h3>See it before it ships</h3><p>Try every colourway and size on your own face in the app — then order with confidence.</p></div>
+      <div class="pledge-item reveal"><span class="eyebrow">Craft</span><h3>Hand-finished acetate</h3><p>Cut, tumbled, and polished by hand. Adjustable spring hinges, five-barrel construction.</p></div>
+      <div class="pledge-item reveal"><span class="eyebrow">Care</span><h3>Lenses done right</h3><p>Single-vision or progressive, anti-glare as standard. Send us your prescription at checkout.</p></div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="wrap">
+    <p class="eyebrow" style="color:var(--cognac);margin-bottom:1.2rem">Aether NY</p>
+    <p class="display">See them<br>on <em>you.</em></p>
+    <div class="footer-grid">
+      <div class="footer-col">
+        <h4>Aether NY</h4>
+        <p style="color:rgba(246,243,237,.6);font-size:.92rem;max-width:34ch">Independent optical, made by hand and seen on your face. New York City.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Shop</h4>
+        <a href="shop.html">All frames</a><a href="shop.html">Eyeglasses</a><a href="shop.html#sun">Sunglasses</a><a href="#tryon">Virtual try-on</a>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <a href="#story">Our story</a><a href="#">Prescriptions</a><a href="#">Returns</a><a href="#">Contact</a>
+      </div>
+    </div>
+    <div class="footer-fine"><span>© 2026 Aether NY. A portfolio concept.</span><span>Try-on · Handmade acetate · Free returns</span></div>
+  </div>
+</footer>
+
+<script src="data.js"></script>
+<script src="main.js"></script>
+</body>
+</html>

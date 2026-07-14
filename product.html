@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Frame — Aether NY</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="nav">
+  <a class="brand" href="index.html">Aether <b>NY</b></a>
+  <nav class="nav-links">
+    <a href="shop.html">Eyeglasses</a>
+    <a href="shop.html#sun">Sunglasses</a>
+    <a href="index.html#tryon">Virtual Try-On</a>
+    <a href="index.html#story">Our Story</a>
+  </nav>
+  <div class="nav-cta"><a class="link-arrow" href="shop.html">Shop all <span>→</span></a><button class="nav-toggle" aria-label="Menu">☰</button></div>
+</header>
+
+<main class="wrap pdp" id="pdp"><!-- rendered --></main>
+
+<section class="pdp-related wrap" id="related" style="display:none">
+  <div class="section-head"><div><span class="eyebrow accent">Keep looking</span><h2>You may also like</h2></div></div>
+  <div class="grid" id="relatedGrid"></div>
+</section>
+
+<footer class="footer">
+  <div class="wrap">
+    <p class="eyebrow" style="color:var(--cognac);margin-bottom:1.2rem">Aether NY</p>
+    <p class="display">See them<br>on <em>you.</em></p>
+    <div class="footer-fine" style="margin-top:2.5rem"><span>© 2026 Aether NY. A portfolio concept.</span><span><a href="shop.html">Shop all frames →</a></span></div>
+  </div>
+</footer>
+
+<script src="data.js"></script>
+<script src="main.js"></script>
+<script>
+(function () {
+  const id = new URLSearchParams(location.search).get('id');
+  const item = (window.CATALOG || []).find(i => i.id === id) || (window.CATALOG || [])[0];
+  const pdp = document.querySelector('#pdp');
+  if (!item) { pdp.innerHTML = '<p class="lede">Frame not found. <a class="link-arrow" href="shop.html">Back to shop →</a></p>'; return; }
+  document.title = item.name + ' — Aether NY';
+  const s = item.sizes || {};
+  const typeLabel = item.type === 'sunglasses' ? 'Sunglasses' : 'Eyeglasses';
+  const cwButtons = item.colorways.map((c, k) =>
+    `<button class="cw ${k===0?'on':''}" style="background:${c.swatch}" data-img="${c.image}" data-name="${c.name}" aria-label="${c.name}"></button>`).join('');
+  pdp.innerHTML = `
+    <div class="pdp-grid">
+      <div class="pdp-stage"><img id="pdpImg" src="${item.colorways[0].image}" alt="${item.name} in ${item.colorways[0].name}"></div>
+      <div>
+        <p class="crumb"><a href="shop.html">Shop</a> / ${typeLabel} / ${item.name}</p>
+        <span class="eyebrow accent pdp-type">${typeLabel} · ${item.shape || 'acetate'}</span>
+        <h1 class="display">${item.name}</h1>
+        <p class="pdp-price">$${item.price}</p>
+        <p class="pdp-desc">${item.description}</p>
+        <span class="eyebrow pdp-label">Colour — <span id="cwCount">${item.colorways.length}</span></span>
+        <div class="pdp-colorways" id="cwRow">${cwButtons}</div>
+        <p class="cw-name" id="cwName">${item.colorways[0].name}</p>
+        <div class="pdp-actions">
+          <a class="btn btn-primary" href="#">Try it on in the app</a>
+          <a class="btn btn-ghost" href="#">Add to bag — $${item.price}</a>
+        </div>
+        <div class="measure">
+          <div><div class="v">${s.lensWidth ?? '—'}</div><div class="l">Lens</div></div>
+          <div><div class="v">${s.bridgeWidth ?? '—'}</div><div class="l">Bridge</div></div>
+          <div><div class="v">${s.templeLength ?? '—'}</div><div class="l">Temple</div></div>
+        </div>
+        <ul class="detail-list">
+          <li><span class="k">Material</span><span>${item.material === 'mixed' ? 'Acetate & metal' : 'Cellulose acetate'}</span></li>
+          <li><span class="k">Lenses</span><span>Anti-reflective, Rx-ready</span></li>
+          <li><span class="k">Try-on</span><span>AR, true millimetre scale</span></li>
+          <li><span class="k">Returns</span><span>Free, within 30 days</span></li>
+        </ul>
+      </div>
+    </div>`;
+  // colorway switching
+  const img = document.querySelector('#pdpImg'), name = document.querySelector('#cwName');
+  document.querySelectorAll('#cwRow .cw').forEach(b => b.addEventListener('click', () => {
+    document.querySelectorAll('#cwRow .cw').forEach(x => x.classList.toggle('on', x === b));
+    img.style.opacity = 0;
+    setTimeout(() => { img.src = b.dataset.img; img.alt = item.name + ' in ' + b.dataset.name; img.style.opacity = 1; }, 180);
+    name.textContent = b.dataset.name;
+  }));
+  img.style.transition = 'opacity .25s';
+  // related — same type, others
+  const rel = (window.CATALOG || []).filter(i => i.id !== item.id && i.type === item.type).slice(0, 3);
+  if (rel.length) {
+    document.querySelector('#related').style.display = '';
+    document.querySelector('#relatedGrid').innerHTML = rel.map(window.AETHER.card).join('');
+  }
+})();
+</script>
+</body>
+</html>
