@@ -7,6 +7,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="styles.css">
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}
+</script>
 </head>
 <body>
 <header class="nav">
@@ -47,14 +50,12 @@
   const s = item.sizes || {};
   const typeLabel = item.type === 'sunglasses' ? 'Sunglasses' : 'Eyeglasses';
   const cwButtons = item.colorways.map((c, k) =>
-    `<button class="cw ${k===0?'on':''}" style="background:${c.swatch}" data-img="${c.image}" data-name="${c.name}" aria-label="${c.name}"></button>`).join('');
+    `<button class="cw ${k===0?'on':''}" style="background:${c.swatch}" data-img="${c.image}" data-model="${c.model}" data-name="${c.name}" aria-label="${c.name}"></button>`).join('');
   pdp.innerHTML = `
     <div class="pdp-grid">
       <div class="pdp-stage" id="pdpStage">
         <img id="pdpImg" src="${item.colorways[0].image}" alt="${item.name} in ${item.colorways[0].name}">
         <div class="pdp-cam" id="pdpCam">
-          <video id="camVideo" autoplay playsinline muted style="display:none"></video>
-          <canvas id="camCanvas"></canvas>
           <span class="cam-live"><span class="dot"></span>Live try-on</span>
           <button class="cam-close" id="camClose" aria-label="Exit try-on">✕</button>
           <button class="btn btn-light cam-cap" id="camCap">Capture look</button>
@@ -92,24 +93,22 @@
         </ul>
       </div>
     </div>`;
-  // colorway switching — updates the still image, and the live frame when trying on
+  // colorway switching — updates the still image, and the live 3D frame when trying on
   const img = document.querySelector('#pdpImg'), name = document.querySelector('#cwName');
-  let tryingOn = false, currentImg = item.colorways[0].image;
+  let tryingOn = false, currentModel = item.colorways[0].model;
   document.querySelectorAll('#cwRow .cw').forEach(b => b.addEventListener('click', () => {
     document.querySelectorAll('#cwRow .cw').forEach(x => x.classList.toggle('on', x === b));
-    currentImg = b.dataset.img;
+    currentModel = b.dataset.model;
     img.style.opacity = 0;
     setTimeout(() => { img.src = b.dataset.img; img.alt = item.name + ' in ' + b.dataset.name; img.style.opacity = 1; }, 180);
     name.textContent = b.dataset.name;
-    if (tryingOn && window.AetherTryOn) window.AetherTryOn.engine.setImage(currentImg);
+    if (tryingOn && window.AetherTryOn) window.AetherTryOn.engine.setModel(currentModel);
   }));
   img.style.transition = 'opacity .25s';
 
-  // in-place live try-on: the product stage morphs into a camera viewport
+  // in-place live 3D try-on: the product stage morphs into a camera viewport
   const stage = document.querySelector('#pdpStage');
   const cam = document.querySelector('#pdpCam');
-  const video = document.querySelector('#camVideo');
-  const canvas = document.querySelector('#camCanvas');
   const status = document.querySelector('#camStatus');
   const csTitle = status.querySelector('.cs-title');
   const csMsg = status.querySelector('.cs-msg');
@@ -128,7 +127,7 @@
     try { await eng.ensureModel(); }
     catch (e) { camStatus('Couldn’t load try-on', 'The face-tracking engine failed to load. Check your connection and try again.', '<button class="btn btn-light retry">Try again</button>'); wireRetry(); return; }
     camStatus('Starting camera…', 'Allow camera access to try the frames on.', '<div class="to-spinner"></div>');
-    try { await eng.start(video, canvas, currentImg); }
+    try { await eng.start(cam, currentModel); }
     catch (e) { camStatus('Camera blocked', 'Allow camera access in your browser, then try again. Your camera stays on your device.', '<button class="btn btn-light retry">Try again</button>'); wireRetry(); return; }
     status.classList.add('hide');
   }
@@ -144,7 +143,7 @@
 
   tryBtn.addEventListener('click', () => tryingOn ? exitTryOn() : enterTryOn());
   document.querySelector('#camClose').addEventListener('click', exitTryOn);
-  document.querySelector('#camCap').addEventListener('click', () => window.AetherTryOn.engine.capture(canvas, item.id));
+  document.querySelector('#camCap').addEventListener('click', () => window.AetherTryOn.engine.capture(item.id));
   window.addEventListener('beforeunload', () => { if (tryingOn) window.AetherTryOn.engine.stop(); });
   // related — same type, others
   const rel = (window.CATALOG || []).filter(i => i.id !== item.id && i.type === item.type).slice(0, 3);
