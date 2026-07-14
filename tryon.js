@@ -17,9 +17,9 @@ const MODEL = "https://storage.googleapis.com/mediapipe-models/face_landmarker/f
    {Start,End} are model-space Z (metres): the arm dissolves from Start
    (opaque, front) to End (transparent, ear), fading into the head like iOS. */
 const TUNE = {
-  fovY: 63, near: 1, far: 2000,
+  fovY: 63, near: 1, far: 2000, exposure: 1.3, envIntensity: 1.6,
   widthK: 1.5, ox: 0, oy: 0, oz: 0.6,
-  templeSplayK: 1, templeSign: 1, templeSplayMax: 0.4,
+  templeSplayBase: 0.34, templeSplayK: 1, templeSign: 1, templeSplayMax: 0.8,
   templeFadeStart: -0.045, templeFadeEnd: -0.12
 };
 const BRIDGE = 168, R_EYE = 33, L_EYE = 263, R_TEMPLE = 234, L_TEMPLE = 454;
@@ -49,7 +49,7 @@ function ensureThree() {
   renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.05;
+  renderer.toneMappingExposure = TUNE.exposure;
   renderer.autoClear = false;
   const canvas = renderer.domElement;
   canvas.className = "tryon-canvas";
@@ -72,11 +72,12 @@ function ensureThree() {
 
   const scene = new THREE.Scene();
   const cam = new THREE.PerspectiveCamera(TUNE.fovY, 1, TUNE.near, TUNE.far);
-  scene.add(new THREE.AmbientLight(0xffffff, 0.5));
-  const key = new THREE.DirectionalLight(0xffffff, 1.2); key.position.set(0.4, 1, 1.2); scene.add(key);
-  const fill = new THREE.DirectionalLight(0xffffff, 0.4); fill.position.set(-0.6, 0.2, 0.6); scene.add(fill);
+  scene.add(new THREE.AmbientLight(0xffffff, 0.75));
+  const key = new THREE.DirectionalLight(0xffffff, 1.6); key.position.set(0.4, 1, 1.2); scene.add(key);
+  const fill = new THREE.DirectionalLight(0xffffff, 0.7); fill.position.set(-0.6, 0.2, 0.6); scene.add(fill);
   const pmrem = new THREE.PMREMGenerator(renderer);
   scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+  scene.environmentIntensity = TUNE.envIntensity;
 
   cam.updateMatrixWorld();
   const glassesRoot = new THREE.Group(); glassesRoot.visible = false; scene.add(glassesRoot);
@@ -164,8 +165,8 @@ function placeGlasses(lm, mtxData) {
     toWorld(lm[R_TEMPLE].x, lm[R_TEMPLE].y, _t1);
     toWorld(lm[L_TEMPLE].x, lm[L_TEMPLE].y, _t2);
     const faceW = _t1.distanceTo(_t2), frameW = currentWidth * scale, templeLen = currentDepth * scale;
-    let splay = 0;
-    if (faceW > frameW && templeLen > 0) splay = Math.asin(Math.min(1, (faceW - frameW) / 2 / templeLen));
+    let splay = TUNE.templeSplayBase; // always open past rest so the arms clear the face
+    if (faceW > frameW && templeLen > 0) splay += Math.asin(Math.min(1, (faceW - frameW) / 2 / templeLen));
     splay = Math.min(splay, TUNE.templeSplayMax) * TUNE.templeSplayK;
     for (const h of currentHinges) h.node.rotation.y = h.baseY - h.side * splay * TUNE.templeSign;
   }
@@ -355,5 +356,6 @@ document.addEventListener("click", e => {
 /* Public API: full-screen for home, engine for the product in-place stage. */
 window.AetherTryOn = {
   open: openOverlay,
-  engine: { start: startEngine, setModel, stop: stopEngine, capture, ensureModel, retune }
+  engine: { start: startEngine, setModel, stop: stopEngine, capture, ensureModel, retune },
+  debug: { three: () => three, hinges: () => currentHinges, TUNE }
 };

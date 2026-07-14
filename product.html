@@ -50,7 +50,7 @@
   const s = item.sizes || {};
   const typeLabel = item.type === 'sunglasses' ? 'Sunglasses' : 'Eyeglasses';
   const cwButtons = item.colorways.map((c, k) =>
-    `<button class="cw ${k===0?'on':''}" style="background:${c.swatch}" data-img="${c.image}" data-model="${c.model}" data-name="${c.name}" aria-label="${c.name}"></button>`).join('');
+    `<button class="cw ${k===0?'on':''}" style="background:${c.swatch}" data-cw="${k}" data-img="${c.image}" data-name="${c.name}" aria-label="${c.name}"></button>`).join('');
   pdp.innerHTML = `
     <div class="pdp-grid">
       <div class="pdp-stage" id="pdpStage">
@@ -76,6 +76,8 @@
         <span class="eyebrow pdp-label">Colour — <span id="cwCount">${item.colorways.length}</span></span>
         <div class="pdp-colorways" id="cwRow">${cwButtons}</div>
         <p class="cw-name" id="cwName">${item.colorways[0].name}</p>
+        <span class="eyebrow pdp-label pdp-fit">Fit — <span id="sizeName"></span></span>
+        <div class="pdp-sizes" id="sizeRow"></div>
         <div class="pdp-actions">
           <button class="btn btn-primary" id="tryOnBtn">Try on — live camera</button>
           <a class="btn btn-ghost" href="#">Add to bag — $${item.price}</a>
@@ -93,16 +95,38 @@
         </ul>
       </div>
     </div>`;
-  // colorway switching — updates the still image, and the live 3D frame when trying on
+  // colour + fit switching — updates the still image and the live 3D frame
   const img = document.querySelector('#pdpImg'), name = document.querySelector('#cwName');
-  let tryingOn = false, currentModel = item.colorways[0].model;
+  const sizeRow = document.querySelector('#sizeRow'), sizeName = document.querySelector('#sizeName');
+  const SIZE_LABEL = { narrow: 'Narrow', medium: 'Medium', wide: 'Wide' };
+  let tryingOn = false, curCw = item.colorways[0], curSize = curCw.variants[0].size;
+  const modelFor = () => (curCw.variants.find(v => v.size === curSize) || curCw.variants[0]).model;
+
+  function renderSizes() {
+    sizeName.textContent = SIZE_LABEL[curSize] || curSize;
+    if (curCw.variants.length > 1) {
+      sizeRow.style.display = '';
+      sizeRow.innerHTML = curCw.variants.map(v =>
+        `<button class="size-chip ${v.size === curSize ? 'on' : ''}" data-size="${v.size}">${SIZE_LABEL[v.size] || v.size}</button>`).join('');
+      sizeRow.querySelectorAll('.size-chip').forEach(b => b.addEventListener('click', () => {
+        curSize = b.dataset.size;
+        sizeRow.querySelectorAll('.size-chip').forEach(x => x.classList.toggle('on', x === b));
+        sizeName.textContent = SIZE_LABEL[curSize] || curSize;
+        if (tryingOn && window.AetherTryOn) window.AetherTryOn.engine.setModel(modelFor());
+      }));
+    } else { sizeRow.style.display = 'none'; sizeRow.innerHTML = ''; }
+  }
+  renderSizes();
+
   document.querySelectorAll('#cwRow .cw').forEach(b => b.addEventListener('click', () => {
     document.querySelectorAll('#cwRow .cw').forEach(x => x.classList.toggle('on', x === b));
-    currentModel = b.dataset.model;
+    curCw = item.colorways[+b.dataset.cw];
+    curSize = curCw.variants.find(v => v.size === curSize) ? curSize : curCw.variants[0].size;
     img.style.opacity = 0;
     setTimeout(() => { img.src = b.dataset.img; img.alt = item.name + ' in ' + b.dataset.name; img.style.opacity = 1; }, 180);
     name.textContent = b.dataset.name;
-    if (tryingOn && window.AetherTryOn) window.AetherTryOn.engine.setModel(currentModel);
+    renderSizes();
+    if (tryingOn && window.AetherTryOn) window.AetherTryOn.engine.setModel(modelFor());
   }));
   img.style.transition = 'opacity .25s';
 
@@ -127,7 +151,7 @@
     try { await eng.ensureModel(); }
     catch (e) { camStatus('Couldn’t load try-on', 'The face-tracking engine failed to load. Check your connection and try again.', '<button class="btn btn-light retry">Try again</button>'); wireRetry(); return; }
     camStatus('Starting camera…', 'Allow camera access to try the frames on.', '<div class="to-spinner"></div>');
-    try { await eng.start(cam, currentModel); }
+    try { await eng.start(cam, modelFor()); }
     catch (e) { camStatus('Camera blocked', 'Allow camera access in your browser, then try again. Your camera stays on your device.', '<button class="btn btn-light retry">Try again</button>'); wireRetry(); return; }
     status.classList.add('hide');
   }

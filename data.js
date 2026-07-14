@@ -19,7 +19,18 @@ window.CATALOG = [
         "swatch": "#8E6A5A",
         "family": "tortoise",
         "image": "assets/frames/blakeley-smoky-mauve-medium.png",
-        "model": "assets/GLB/blakeley-opt-sbf-smoky-mauve-tortoise_medium.glb"
+        "model": "assets/GLB/blakeley-opt-sbf-smoky-mauve-tortoise_narrow.glb",
+        "variants": [
+          {
+            "size": "narrow",
+            "model": "assets/GLB/blakeley-opt-sbf-smoky-mauve-tortoise_narrow.glb"
+          },
+          {
+            "size": "medium",
+            "model": "assets/GLB/blakeley-opt-sbf-smoky-mauve-tortoise_medium.glb"
+          }
+        ],
+        "size": "narrow"
       }
     ]
   },
@@ -43,7 +54,14 @@ window.CATALOG = [
         "swatch": "#7A93A7",
         "family": "blue",
         "image": "assets/frames/brimmer-sun-harbor.png",
-        "model": "assets/GLB/brimmer-sun-sbf-harbor-crystal_wide.glb"
+        "model": "assets/GLB/brimmer-sun-sbf-harbor-crystal_wide.glb",
+        "variants": [
+          {
+            "size": "wide",
+            "model": "assets/GLB/brimmer-sun-sbf-harbor-crystal_wide.glb"
+          }
+        ],
+        "size": "wide"
       }
     ]
   },
@@ -67,7 +85,14 @@ window.CATALOG = [
         "swatch": "#6E7F5C",
         "family": "green",
         "image": "assets/frames/carlton-seaweed.png",
-        "model": "assets/GLB/carlton-opt-sbf-seaweed-crystal_narrow.glb"
+        "model": "assets/GLB/carlton-opt-sbf-seaweed-crystal_narrow.glb",
+        "variants": [
+          {
+            "size": "narrow",
+            "model": "assets/GLB/carlton-opt-sbf-seaweed-crystal_narrow.glb"
+          }
+        ],
+        "size": "narrow"
       }
     ]
   },
@@ -91,14 +116,28 @@ window.CATALOG = [
         "swatch": "#C4A582",
         "family": "brown",
         "image": "assets/frames/carson-chai.png",
-        "model": "assets/GLB/carson-opt-sbf-chai-crystal-fade_wide.glb"
+        "model": "assets/GLB/carson-opt-sbf-chai-crystal-fade_wide.glb",
+        "variants": [
+          {
+            "size": "wide",
+            "model": "assets/GLB/carson-opt-sbf-chai-crystal-fade_wide.glb"
+          }
+        ],
+        "size": "wide"
       },
       {
         "name": "Cinnamon Tortoise",
         "swatch": "#7B4B2A",
         "family": "tortoise",
         "image": "assets/frames/carson-cinnamon.png",
-        "model": "assets/GLB/carson-opt-sbf-cinnamon-tortoise_wide.glb"
+        "model": "assets/GLB/carson-opt-sbf-cinnamon-tortoise_wide.glb",
+        "variants": [
+          {
+            "size": "wide",
+            "model": "assets/GLB/carson-opt-sbf-cinnamon-tortoise_wide.glb"
+          }
+        ],
+        "size": "wide"
       }
     ]
   },
@@ -122,14 +161,28 @@ window.CATALOG = [
         "swatch": "#C4A582",
         "family": "brown",
         "image": "assets/frames/carson-sun-chai.png",
-        "model": "assets/GLB/carson-sun-sbf-chai-crystal-fade_wide.glb"
+        "model": "assets/GLB/carson-sun-sbf-chai-crystal-fade_wide.glb",
+        "variants": [
+          {
+            "size": "wide",
+            "model": "assets/GLB/carson-sun-sbf-chai-crystal-fade_wide.glb"
+          }
+        ],
+        "size": "wide"
       },
       {
         "name": "Cinnamon Tortoise",
         "swatch": "#7B4B2A",
         "family": "tortoise",
         "image": "assets/frames/carson-sun-cinnamon.png",
-        "model": "assets/GLB/carson-sun-sbf-cinnamon-tortoise_wide.glb"
+        "model": "assets/GLB/carson-sun-sbf-cinnamon-tortoise_wide.glb",
+        "variants": [
+          {
+            "size": "wide",
+            "model": "assets/GLB/carson-sun-sbf-cinnamon-tortoise_wide.glb"
+          }
+        ],
+        "size": "wide"
       }
     ]
   },
@@ -153,14 +206,28 @@ window.CATALOG = [
         "swatch": "#9C8AA5",
         "family": "tortoise",
         "image": "assets/frames/cicely-lavender.png",
-        "model": "assets/GLB/cicely-opt-sbf-lavender-tortoise-with-riesling_wide.glb"
+        "model": "assets/GLB/cicely-opt-sbf-lavender-tortoise-with-riesling_wide.glb",
+        "variants": [
+          {
+            "size": "wide",
+            "model": "assets/GLB/cicely-opt-sbf-lavender-tortoise-with-riesling_wide.glb"
+          }
+        ],
+        "size": "wide"
       },
       {
         "name": "Nutmeg Crystal Gold",
         "swatch": "#A67B4F",
         "family": "gold",
         "image": "assets/frames/cicely-nutmeg.png",
-        "model": "assets/GLB/cicely-opt-sbf-nutmeg-crystal-with-polished-gold_wide.glb"
+        "model": "assets/GLB/cicely-opt-sbf-nutmeg-crystal-with-polished-gold_wide.glb",
+        "variants": [
+          {
+            "size": "wide",
+            "model": "assets/GLB/cicely-opt-sbf-nutmeg-crystal-with-polished-gold_wide.glb"
+          }
+        ],
+        "size": "wide"
       }
     ]
   },
@@ -184,14 +251,28 @@ window.CATALOG = [
         "swatch": "#9C8AA5",
         "family": "tortoise",
         "image": "assets/frames/cicely-sun-lavender.png",
-        "model": "assets/GLB/cicely-sun-sbf-lavender-tortoise-with-riesling_wide.glb"
+        "model": "assets/GLB/cicely-sun-sbf-lavender-tortoise-with-riesling_wide.glb",
+        "variants": [
+          {
+            "size": "wide",
+            "model": "assets/GLB/cicely-sun-sbf-lavender-tortoise-with-riesling_wide.glb"
+          }
+        ],
+        "size": "wide"
       },
       {
         "name": "Nutmeg Crystal Gold",
         "swatch": "#A67B4F",
         "family": "gold",
         "image": "assets/frames/cicely-sun-nutmeg.png",
-        "model": "assets/GLB/cicely-sun-sbf-nutmeg-crystal-with-polished-gold_wide.glb"
+        "model": "assets/GLB/cicely-sun-sbf-nutmeg-crystal-with-polished-gold_wide.glb",
+        "variants": [
+          {
+            "size": "wide",
+            "model": "assets/GLB/cicely-sun-sbf-nutmeg-crystal-with-polished-gold_wide.glb"
+          }
+        ],
+        "size": "wide"
       }
     ]
   },
@@ -215,14 +296,28 @@ window.CATALOG = [
         "swatch": "#6E7F5C",
         "family": "green",
         "image": "assets/frames/claude-seaweed.png",
-        "model": "assets/GLB/claude-opt-sbf-seaweed-crystal-with-antique-silver_wide.glb"
+        "model": "assets/GLB/claude-opt-sbf-seaweed-crystal-with-antique-silver_wide.glb",
+        "variants": [
+          {
+            "size": "wide",
+            "model": "assets/GLB/claude-opt-sbf-seaweed-crystal-with-antique-silver_wide.glb"
+          }
+        ],
+        "size": "wide"
       },
       {
         "name": "Umber Crystal",
         "swatch": "#6B4F3A",
         "family": "brown",
         "image": "assets/frames/claude-umber.png",
-        "model": "assets/GLB/claude-opt-sbf-umber-crystal-with-riesling_wide.glb"
+        "model": "assets/GLB/claude-opt-sbf-umber-crystal-with-riesling_wide.glb",
+        "variants": [
+          {
+            "size": "wide",
+            "model": "assets/GLB/claude-opt-sbf-umber-crystal-with-riesling_wide.glb"
+          }
+        ],
+        "size": "wide"
       }
     ]
   },
@@ -246,14 +341,28 @@ window.CATALOG = [
         "swatch": "#6E7F5C",
         "family": "green",
         "image": "assets/frames/claude-sun-seaweed.png",
-        "model": "assets/GLB/claude-sun-sbf-seaweed-crystal-with-antique-silver_wide.glb"
+        "model": "assets/GLB/claude-sun-sbf-seaweed-crystal-with-antique-silver_wide.glb",
+        "variants": [
+          {
+            "size": "wide",
+            "model": "assets/GLB/claude-sun-sbf-seaweed-crystal-with-antique-silver_wide.glb"
+          }
+        ],
+        "size": "wide"
       },
       {
         "name": "Umber Crystal",
         "swatch": "#6B4F3A",
         "family": "brown",
         "image": "assets/frames/claude-sun-umber.png",
-        "model": "assets/GLB/claude-sun-sbf-umber-crystal-with-riesling_wide.glb"
+        "model": "assets/GLB/claude-sun-sbf-umber-crystal-with-riesling_wide.glb",
+        "variants": [
+          {
+            "size": "wide",
+            "model": "assets/GLB/claude-sun-sbf-umber-crystal-with-riesling_wide.glb"
+          }
+        ],
+        "size": "wide"
       }
     ]
   },
@@ -277,7 +386,14 @@ window.CATALOG = [
         "swatch": "#4E7E8C",
         "family": "blue",
         "image": "assets/frames/hector-laguna.png",
-        "model": "assets/GLB/hector-opt-sbf-laguna-crystal-matte_medium.glb"
+        "model": "assets/GLB/hector-opt-sbf-laguna-crystal-matte_medium.glb",
+        "variants": [
+          {
+            "size": "medium",
+            "model": "assets/GLB/hector-opt-sbf-laguna-crystal-matte_medium.glb"
+          }
+        ],
+        "size": "medium"
       }
     ]
   },
@@ -301,14 +417,28 @@ window.CATALOG = [
         "swatch": "#7A2E39",
         "family": "red",
         "image": "assets/frames/ketty-amarena.png",
-        "model": "assets/GLB/ketty-opt-sbf-amarena_wide.glb"
+        "model": "assets/GLB/ketty-opt-sbf-amarena_wide.glb",
+        "variants": [
+          {
+            "size": "wide",
+            "model": "assets/GLB/ketty-opt-sbf-amarena_wide.glb"
+          }
+        ],
+        "size": "wide"
       },
       {
         "name": "Terrazzo Tortoise",
         "swatch": "#8A6248",
         "family": "tortoise",
         "image": "assets/frames/ketty-terrazzo.png",
-        "model": "assets/GLB/ketty-opt-sbf-terrazzo-tortoise_wide.glb"
+        "model": "assets/GLB/ketty-opt-sbf-terrazzo-tortoise_wide.glb",
+        "variants": [
+          {
+            "size": "wide",
+            "model": "assets/GLB/ketty-opt-sbf-terrazzo-tortoise_wide.glb"
+          }
+        ],
+        "size": "wide"
       }
     ]
   },
@@ -332,7 +462,14 @@ window.CATALOG = [
         "swatch": "#8A6248",
         "family": "tortoise",
         "image": "assets/frames/rosie-sun-terrazzo.png",
-        "model": "assets/GLB/rosie-sun-sbf-terrazzo-tortoise_wide.glb"
+        "model": "assets/GLB/rosie-sun-sbf-terrazzo-tortoise_wide.glb",
+        "variants": [
+          {
+            "size": "wide",
+            "model": "assets/GLB/rosie-sun-sbf-terrazzo-tortoise_wide.glb"
+          }
+        ],
+        "size": "wide"
       }
     ]
   },
@@ -356,14 +493,28 @@ window.CATALOG = [
         "swatch": "#3B2F2A",
         "family": "black",
         "image": "assets/frames/winston-black-oak.png",
-        "model": "assets/GLB/winston-opt-sbf-black-oak-tortoise_narrow.glb"
+        "model": "assets/GLB/winston-opt-sbf-black-oak-tortoise_narrow.glb",
+        "variants": [
+          {
+            "size": "narrow",
+            "model": "assets/GLB/winston-opt-sbf-black-oak-tortoise_narrow.glb"
+          }
+        ],
+        "size": "narrow"
       },
       {
         "name": "Rosemary Crystal",
         "swatch": "#5C6B4F",
         "family": "green",
         "image": "assets/frames/winston-rosemary.png",
-        "model": "assets/GLB/winston-opt-sbf-rosemary-crystal_narrow.glb"
+        "model": "assets/GLB/winston-opt-sbf-rosemary-crystal_narrow.glb",
+        "variants": [
+          {
+            "size": "narrow",
+            "model": "assets/GLB/winston-opt-sbf-rosemary-crystal_narrow.glb"
+          }
+        ],
+        "size": "narrow"
       }
     ]
   }
