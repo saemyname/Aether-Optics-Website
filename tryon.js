@@ -105,9 +105,11 @@ function applyTempleFade(root) {
       col[i * 4] = 1; col[i * 4 + 1] = 1; col[i * 4 + 2] = 1; col[i * 4 + 3] = a;
     }
     o.geometry.setAttribute("color", new THREE.BufferAttribute(col, 4));
-    (Array.isArray(o.material) ? o.material : [o.material]).forEach(m => {
-      m.vertexColors = true; m.transparent = true; m.depthWrite = false; m.needsUpdate = true;
-    });
+    // Clone the material before enabling the fade: some frames share one
+    // material between the temple and the front (e.g. Blakeley narrow), and
+    // mutating it in place would turn the whole front frame translucent.
+    const fade = m => { const c = m.clone(); c.vertexColors = true; c.transparent = true; c.depthWrite = false; return c; };
+    o.material = Array.isArray(o.material) ? o.material.map(fade) : fade(o.material);
   });
 }
 
