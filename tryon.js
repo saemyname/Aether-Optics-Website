@@ -10,21 +10,25 @@ import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 const VISION = "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm";
 const MODEL = "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task";
 
-/* Fit tuning. The head-pose matrix and glasses live in the canonical face
-   frame; models are in metres, the matrix in centimetres, hence scale ≈ 100.
-   offset places the frame on the nose bridge (cm). templeFade{Start,End} are
-   model-space Z (metres): the arm dissolves from Start (opaque, front) to End
-   (transparent, ear) so the temples fade into the head like the iOS app. */
+/* Fit tuning. Glasses are anchored directly to the eye landmarks: positioned
+   at the nose bridge, scaled to the outer-eye-corner span, oriented by the
+   head-pose matrix. widthK: frame width ÷ outer-eye-corner distance. ox/oy/oz:
+   small head-local nudges (cm) — oz seats the frame onto the face. templeFade
+   {Start,End} are model-space Z (metres): the arm dissolves from Start
+   (opaque, front) to End (transparent, ear), fading into the head like iOS. */
 const TUNE = {
   fovY: 63, near: 1, far: 2000,
-  scale: 100, ox: 0, oy: 1.2, oz: 5.2,
+  widthK: 1.5, ox: 0, oy: 0, oz: 0.6,
   templeFadeStart: -0.045, templeFadeEnd: -0.12
 };
+const BRIDGE = 168, R_EYE = 33, L_EYE = 263;
 
 /* ---------- shared engine ---------- */
 let landmarker = null, stream = null, raf = null, lastTs = -1;
-let three = null, mountEl = null, currentModelUrl = null;
+let three = null, mountEl = null, currentModelUrl = null, currentWidth = 0.134;
 const modelCache = new Map();
+const _m = new THREE.Matrix4(), _p = new THREE.Vector3(), _q = new THREE.Quaternion(), _s = new THREE.Vector3();
+const _pos = new THREE.Vector3(), _e1 = new THREE.Vector3(), _e2 = new THREE.Vector3(), _off = new THREE.Vector3();
 
 async function ensureModel() {
   if (landmarker) return;
@@ -58,7 +62,9 @@ function ensureThree() {
   const bgCam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
   bgScene.add(new THREE.Mesh(
     new THREE.PlaneGeometry(2, 2),
-    new THREE.MeshBasicMaterial({ map: videoTex, depthTest: false, depthWrite: false })
+    // toneMapped:false keeps the webcam feed true-colour — only the glasses
+    // get ACES tone mapping, so the video isn't tinted warm/filmic.
+    new THREE.MeshBasicMaterial({ map: videoTex, depthTest: false, depthWrite: false, toneMapped: false })
   ));
 
   const scene = new THREE.Scene();
@@ -69,10 +75,10 @@ function ensureThree() {
   const pmrem = new THREE.PMREMGenerator(renderer);
   scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
 
-  const faceGroup = new THREE.Group(); faceGroup.matrixAutoUpdate = false; scene.add(faceGroup);
-  const glassesRoot = new THREE.Group(); glassesRoot.visible = false; faceGroup.add(glassesRoot);
+  cam.updateMatrixWorld();
+  const glassesRoot = new THREE.Group(); glassesRoot.visible = false; scene.add(glassesRoot);
 
-  three = { renderer, canvas, video, videoTex, bgScene, bgCam, scene, cam, faceGroup, glassesRoot, loader: new GLTFLoader() };
+  three = { renderer, canvas, video, videoTex, bgScene, bgCam, scene, cam, glassesRoot, loader: new GLTFLoader() };
   return three;
 }
 
@@ -104,20 +110,42 @@ async function loadModel(url) {
   const gltf = await three.loader.loadAsync(url);
   const root = gltf.scene;
   applyTempleFade(root);
-  modelCache.set(url, root);
-  return root;
+  const box = new THREE.Box3().setFromObject(root);
+  const entry = { root, width: box.max.x - box.min.x }; // native model width (metres)
+  modelCache.set(url, entry);
+  return entry;
 }
 
 async function setModel(url) {
   currentModelUrl = url;
   const t = ensureThree();
-  const root = await loadModel(url);
+  const entry = await loadModel(url);
   if (currentModelUrl !== url) return; // superseded while loading
   const g = t.glassesRoot;
   while (g.children.length) g.remove(g.children[0]);
-  g.add(root);
-  g.scale.setScalar(TUNE.scale);
-  g.position.set(TUNE.ox, TUNE.oy, TUNE.oz);
+  g.add(entry.root);
+  currentWidth = entry.width;
+}
+
+/* Anchor the frame to the eyes: nose-bridge position, outer-eye-corner scale,
+   head-pose rotation. All world units are the head-pose matrix's (centimetres). */
+function placeGlasses(lm, mtxData) {
+  const t = three, cam = t.cam;
+  _m.fromArray(mtxData); _m.decompose(_p, _q, _s);
+  const depth = _p.z; // face distance in view space (negative, in front of camera)
+  const toWorld = (nx, ny, out) => {
+    out.set(nx * 2 - 1, -(ny * 2 - 1), 0.5).unproject(cam);
+    return out.multiplyScalar(depth / out.z); // ride the ray out to the face depth
+  };
+  toWorld(lm[BRIDGE].x, lm[BRIDGE].y, _pos);
+  toWorld(lm[R_EYE].x, lm[R_EYE].y, _e1);
+  toWorld(lm[L_EYE].x, lm[L_EYE].y, _e2);
+  const scale = (_e1.distanceTo(_e2) * TUNE.widthK) / currentWidth;
+  const g = t.glassesRoot;
+  g.quaternion.copy(_q);
+  g.scale.setScalar(scale);
+  _off.set(TUNE.ox, TUNE.oy, TUNE.oz).applyQuaternion(_q);
+  g.position.copy(_pos).add(_off);
 }
 
 function sizeToVideo() {
@@ -145,8 +173,9 @@ function loop() {
       lastTs = ts;
       let r = null;
       try { r = landmarker.detectForVideo(v, ts); } catch (e) {}
+      const lm = r && r.faceLandmarks && r.faceLandmarks[0];
       const mtx = r && r.facialTransformationMatrixes && r.facialTransformationMatrixes[0];
-      if (mtx) { t.faceGroup.matrix.fromArray(mtx.data); t.glassesRoot.visible = true; }
+      if (lm && mtx) { placeGlasses(lm, mtx.data); t.glassesRoot.visible = true; }
       else { t.glassesRoot.visible = false; }
     }
     t.videoTex.needsUpdate = true;
@@ -193,11 +222,15 @@ function capture(name) {
   a.click();
 }
 
-/* Live-tuning helper (console): AetherTryOn.engine.retune({oy:1.5, scale:105}) */
+/* Live-tuning helper (console): AetherTryOn.engine.retune({widthK:1.6, oy:0.3})
+   widthK/ox/oy/oz apply next frame; fov and templeFade take effect here. */
 function retune(patch) {
   Object.assign(TUNE, patch);
   if (three) { three.cam.fov = TUNE.fovY; three.cam.updateProjectionMatrix(); }
-  if (currentModelUrl) { modelCache.delete(currentModelUrl); return setModel(currentModelUrl); }
+  if (("templeFadeStart" in patch || "templeFadeEnd" in patch) && currentModelUrl) {
+    modelCache.delete(currentModelUrl);
+    return setModel(currentModelUrl);
+  }
 }
 
 /* ---------- Host A: full-screen overlay (home / anywhere) ---------- */
