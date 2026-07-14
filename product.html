@@ -50,7 +50,22 @@
     `<button class="cw ${k===0?'on':''}" style="background:${c.swatch}" data-img="${c.image}" data-name="${c.name}" aria-label="${c.name}"></button>`).join('');
   pdp.innerHTML = `
     <div class="pdp-grid">
-      <div class="pdp-stage"><img id="pdpImg" src="${item.colorways[0].image}" alt="${item.name} in ${item.colorways[0].name}"></div>
+      <div class="pdp-stage" id="pdpStage">
+        <img id="pdpImg" src="${item.colorways[0].image}" alt="${item.name} in ${item.colorways[0].name}">
+        <div class="pdp-cam" id="pdpCam">
+          <video id="camVideo" autoplay playsinline muted style="display:none"></video>
+          <canvas id="camCanvas"></canvas>
+          <span class="cam-live"><span class="dot"></span>Live try-on</span>
+          <button class="cam-close" id="camClose" aria-label="Exit try-on">✕</button>
+          <button class="btn btn-light cam-cap" id="camCap">Capture look</button>
+          <div class="cam-status" id="camStatus"><div>
+            <span class="eyebrow">Virtual try-on</span>
+            <h4 class="cs-title">Starting camera…</h4>
+            <p class="cs-msg">Allow camera access — the frames land on your face in true scale. Nothing is recorded or uploaded.</p>
+            <div class="cs-action"><div class="to-spinner"></div></div>
+          </div></div>
+        </div>
+      </div>
       <div>
         <p class="crumb"><a href="shop.html">Shop</a> / ${typeLabel} / ${item.name}</p>
         <span class="eyebrow accent pdp-type">${typeLabel} · ${item.shape || 'acetate'}</span>
@@ -61,7 +76,7 @@
         <div class="pdp-colorways" id="cwRow">${cwButtons}</div>
         <p class="cw-name" id="cwName">${item.colorways[0].name}</p>
         <div class="pdp-actions">
-          <button class="btn btn-primary" data-tryon="${item.id}">Try on — live camera</button>
+          <button class="btn btn-primary" id="tryOnBtn">Try on — live camera</button>
           <a class="btn btn-ghost" href="#">Add to bag — $${item.price}</a>
         </div>
         <div class="measure">
@@ -77,15 +92,60 @@
         </ul>
       </div>
     </div>`;
-  // colorway switching
+  // colorway switching — updates the still image, and the live frame when trying on
   const img = document.querySelector('#pdpImg'), name = document.querySelector('#cwName');
+  let tryingOn = false, currentImg = item.colorways[0].image;
   document.querySelectorAll('#cwRow .cw').forEach(b => b.addEventListener('click', () => {
     document.querySelectorAll('#cwRow .cw').forEach(x => x.classList.toggle('on', x === b));
+    currentImg = b.dataset.img;
     img.style.opacity = 0;
     setTimeout(() => { img.src = b.dataset.img; img.alt = item.name + ' in ' + b.dataset.name; img.style.opacity = 1; }, 180);
     name.textContent = b.dataset.name;
+    if (tryingOn && window.AetherTryOn) window.AetherTryOn.engine.setImage(currentImg);
   }));
   img.style.transition = 'opacity .25s';
+
+  // in-place live try-on: the product stage morphs into a camera viewport
+  const stage = document.querySelector('#pdpStage');
+  const cam = document.querySelector('#pdpCam');
+  const video = document.querySelector('#camVideo');
+  const canvas = document.querySelector('#camCanvas');
+  const status = document.querySelector('#camStatus');
+  const csTitle = status.querySelector('.cs-title');
+  const csMsg = status.querySelector('.cs-msg');
+  const csAction = status.querySelector('.cs-action');
+  const tryBtn = document.querySelector('#tryOnBtn');
+
+  function camStatus(t, m, a) { status.classList.remove('hide'); csTitle.textContent = t; csMsg.textContent = m; csAction.innerHTML = a || ''; }
+
+  async function enterTryOn() {
+    if (!window.AetherTryOn) return;
+    tryingOn = true;
+    stage.classList.add('trying-on');
+    tryBtn.textContent = 'Exit try-on';
+    camStatus('Loading face tracking…', 'One moment — readying the fitting mirror.', '<div class="to-spinner"></div>');
+    const eng = window.AetherTryOn.engine;
+    try { await eng.ensureModel(); }
+    catch (e) { camStatus('Couldn’t load try-on', 'The face-tracking engine failed to load. Check your connection and try again.', '<button class="btn btn-light retry">Try again</button>'); wireRetry(); return; }
+    camStatus('Starting camera…', 'Allow camera access to try the frames on.', '<div class="to-spinner"></div>');
+    try { await eng.start(video, canvas, currentImg); }
+    catch (e) { camStatus('Camera blocked', 'Allow camera access in your browser, then try again. Your camera stays on your device.', '<button class="btn btn-light retry">Try again</button>'); wireRetry(); return; }
+    status.classList.add('hide');
+  }
+  function wireRetry() { csAction.querySelector('.retry')?.addEventListener('click', enterTryOn); }
+
+  function exitTryOn() {
+    if (window.AetherTryOn) window.AetherTryOn.engine.stop();
+    tryingOn = false;
+    stage.classList.remove('trying-on');
+    tryBtn.textContent = 'Try on — live camera';
+    status.classList.remove('hide');
+  }
+
+  tryBtn.addEventListener('click', () => tryingOn ? exitTryOn() : enterTryOn());
+  document.querySelector('#camClose').addEventListener('click', exitTryOn);
+  document.querySelector('#camCap').addEventListener('click', () => window.AetherTryOn.engine.capture(canvas, item.id));
+  window.addEventListener('beforeunload', () => { if (tryingOn) window.AetherTryOn.engine.stop(); });
   // related — same type, others
   const rel = (window.CATALOG || []).filter(i => i.id !== item.id && i.type === item.type).slice(0, 3);
   if (rel.length) {
