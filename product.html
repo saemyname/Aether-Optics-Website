@@ -61,7 +61,7 @@
         <div class="pdp-colorways" id="cwRow">${cwButtons}</div>
         <p class="cw-name" id="cwName">${item.colorways[0].name}</p>
         <div class="pdp-actions">
-          <a class="btn btn-primary" href="#">Try it on in the app</a>
+          <button class="btn btn-primary" data-tryon="${item.id}">Try on — live camera</button>
           <a class="btn btn-ghost" href="#">Add to bag — $${item.price}</a>
         </div>
         <div class="measure">
@@ -94,5 +94,6 @@
   }
 })();
 </script>
+<script type="module" src="tryon.js"></script>
 </body>
 </html>

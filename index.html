@@ -33,8 +33,8 @@
         <h1 class="display">Eyewear,<br>seen <em>on you.</em></h1>
         <p class="lede">Hand-finished acetate frames you can try on your own face before they arrive — no guesswork, no waiting room.</p>
         <div class="hero-actions">
-          <a class="btn btn-primary" href="shop.html">Shop the collection</a>
-          <a class="btn btn-ghost" href="#tryon">See the try-on ↓</a>
+          <button class="btn btn-primary" data-tryon="">Try them on</button>
+          <a class="btn btn-ghost" href="shop.html">Shop the collection</a>
         </div>
       </div>
       <div class="hero-stage">
@@ -57,15 +57,15 @@
   <section class="tryon" id="tryon">
     <div class="wrap tryon-grid">
       <div class="tryon-copy reveal">
-        <span class="eyebrow">The Aether app</span>
+        <span class="eyebrow">Try-on · right here</span>
         <h2>Every frame,<br>on your face.</h2>
-        <p class="lede">Point your camera and the frames settle onto your face in true scale — turn your head, catch the light, see the fit. It’s the fitting room, wherever you are.</p>
+        <p class="lede">No app, no download. Click try-on and your camera opens — the frames settle onto your face in true scale, so you can see the fit before you buy.</p>
         <ol class="tryon-steps">
           <li><span class="num">01</span><div><b>Open the camera</b><p>Face tracking finds your eyes and bridge.</p></div></li>
           <li><span class="num">02</span><div><b>Tap through frames</b><p>Each pair lands in true millimetre scale.</p></div></li>
           <li><span class="num">03</span><div><b>Capture your look</b><p>Save the shot, share it, add to bag.</p></div></li>
         </ol>
-        <a class="btn btn-light" href="#">Get the app</a>
+        <button class="btn btn-light" data-tryon="">Try it on live</button>
       </div>
       <div class="tryon-view reveal">
         <div class="viewport" id="viewport">
@@ -148,5 +148,6 @@
 
 <script src="data.js"></script>
 <script src="main.js"></script>
+<script type="module" src="tryon.js"></script>
 </body>
 </html>
