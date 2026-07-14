@@ -154,6 +154,12 @@ section { position: relative; }
   background: radial-gradient(circle at 50% 40%, var(--lens-tint), transparent 62%);
 }
 .hero-frame { width: 82%; position: relative; z-index: 2; filter: drop-shadow(0 24px 40px rgba(28,25,23,.18)); animation: floaty 7s ease-in-out infinite; }
+.hero-3d { position: relative; z-index: 2; width: 90%; aspect-ratio: 1/1; place-self: center; cursor: grab; touch-action: none; opacity: 0; transition: opacity .8s ease; animation: floaty 7s ease-in-out infinite; }
+.hero-3d.ready { opacity: 1; }
+.hero-3d.grab { cursor: grabbing; }
+.hero-3d canvas { width: 100%; height: 100%; display: block; filter: drop-shadow(0 22px 38px rgba(28,25,23,.20)); }
+.hero-hint { position: absolute; bottom: -1.6rem; left: 50%; transform: translateX(-50%); font-size: .68rem; letter-spacing: .18em; text-transform: uppercase; color: var(--stone); pointer-events: none; white-space: nowrap; transition: opacity .5s ease; z-index: 3; }
+.hero-3d.touched .hero-hint { opacity: 0; }
 .hero-tag { position:absolute; z-index: 3; font-size: .72rem; letter-spacing:.16em; text-transform:uppercase; color: var(--stone); }
 .hero-tag.tl { top: 10%; left: 2%; } .hero-tag.br { bottom: 12%; right: 2%; color: var(--cognac); }
 @keyframes floaty { 0%,100%{ transform: translateY(-8px);} 50%{ transform: translateY(8px);} }
