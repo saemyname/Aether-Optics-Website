@@ -22,7 +22,7 @@
   /* ---- Home: collection preview (first 6) ---- */
   const grid = $('#collectionGrid');
   if (grid && window.CATALOG) {
-    grid.innerHTML = CATALOG.slice(0, 6).map(card).join('');
+    grid.innerHTML = CATALOG.slice(0, 3).map(card).join('');
   }
 
   /* ---- Home: try-on viewport cycling ---- */
