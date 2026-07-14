@@ -19,7 +19,7 @@ const MODEL = "https://storage.googleapis.com/mediapipe-models/face_landmarker/f
 const TUNE = {
   fovY: 63, near: 1, far: 2000, exposure: 1.3, envIntensity: 1.6,
   widthK: 1.5, ox: 0, oy: 0, oz: 0.6,
-  templeSplayBase: 0.34, templeSplayK: 1, templeSign: 1, templeSplayMax: 0.8,
+  templeSplayBase: 0.55, templeSplayK: 1, templeSign: 1, templeSplayMax: 1.1,
   templeFadeStart: -0.045, templeFadeEnd: -0.12
 };
 const BRIDGE = 168, R_EYE = 33, L_EYE = 263, R_TEMPLE = 234, L_TEMPLE = 454;
@@ -27,8 +27,10 @@ const BRIDGE = 168, R_EYE = 33, L_EYE = 263, R_TEMPLE = 234, L_TEMPLE = 454;
 /* ---------- shared engine ---------- */
 let landmarker = null, stream = null, raf = null, lastTs = -1;
 let three = null, mountEl = null, currentModelUrl = null;
-let currentWidth = 0.134, currentDepth = 0.135, currentHinges = [];
+let currentWidth = 0.134, currentDepth = 0.135, currentRef = 0.134, currentHinges = [];
 const modelCache = new Map();
+const refWidth = new Map(); // frame stem -> reference width, so size variants scale proportionally
+const stemOf = url => url.replace(/_(narrow|medium|wide)\.glb$/i, "");
 const _m = new THREE.Matrix4(), _p = new THREE.Vector3(), _q = new THREE.Quaternion(), _s = new THREE.Vector3();
 const _pos = new THREE.Vector3(), _e1 = new THREE.Vector3(), _e2 = new THREE.Vector3(), _off = new THREE.Vector3();
 const _t1 = new THREE.Vector3(), _t2 = new THREE.Vector3();
@@ -123,7 +125,10 @@ async function loadModel(url) {
     }
   });
   const box = new THREE.Box3().setFromObject(root);
-  const entry = { root, width: box.max.x - box.min.x, depth: box.max.z - box.min.z, hinges };
+  const width = box.max.x - box.min.x;
+  const stem = stemOf(url);
+  if (!refWidth.has(stem)) refWidth.set(stem, width); // first-loaded variant anchors the frame's scale
+  const entry = { root, width, depth: box.max.z - box.min.z, hinges, stem };
   modelCache.set(url, entry);
   return entry;
 }
@@ -137,6 +142,7 @@ async function setModel(url) {
   while (g.children.length) g.remove(g.children[0]);
   g.add(entry.root);
   currentWidth = entry.width; currentDepth = entry.depth; currentHinges = entry.hinges;
+  currentRef = refWidth.get(entry.stem) || entry.width; // shared across a frame's sizes
 }
 
 /* Anchor the frame to the eyes: nose-bridge position, outer-eye-corner scale,
@@ -152,7 +158,9 @@ function placeGlasses(lm, mtxData) {
   toWorld(lm[BRIDGE].x, lm[BRIDGE].y, _pos);
   toWorld(lm[R_EYE].x, lm[R_EYE].y, _e1);
   toWorld(lm[L_EYE].x, lm[L_EYE].y, _e2);
-  const scale = (_e1.distanceTo(_e2) * TUNE.widthK) / currentWidth;
+  // scale on the frame's shared reference width so different sizes render at
+  // their true relative size (medium wider than narrow), not all normalised.
+  const scale = (_e1.distanceTo(_e2) * TUNE.widthK) / currentRef;
   const g = t.glassesRoot;
   g.quaternion.copy(_q);
   g.scale.setScalar(scale);
