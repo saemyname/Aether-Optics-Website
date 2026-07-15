@@ -446,6 +446,23 @@ section { position: relative; }
 .to-chip.on { background:var(--paper); color:var(--espresso); border-color:var(--paper); }
 .to-chip:hover:not(.on) { border-color:var(--paper); }
 @media (max-width:560px){ .to-bar { flex-direction:column; align-items:flex-start; gap:.4rem; } .to-info2 { text-align:left; } }
+.to-topbtns { display:flex; gap:.7rem; align-items:center; }
+.to-room { background:none; border:1px solid rgba(246,243,237,.25); color:var(--paper); height:42px; padding:0 1.15rem; border-radius:999px; font:600 .78rem var(--sans); cursor:pointer; transition:.2s; }
+.to-room:hover { background:rgba(246,243,237,.1); }
+.to-roomname { display:none; }
+
+/* Immersive "try-on room": fullscreen mirror + transparent minimal UI */
+.to-overlay.room .to-view { position:fixed; inset:0; width:auto; height:auto; aspect-ratio:auto; border-radius:0; box-shadow:none; }
+.to-overlay.room .to-view::after { content:''; position:absolute; inset:0; pointer-events:none; box-shadow: inset 0 0 240px rgba(0,0,0,.5); z-index:2; }
+.to-overlay.room .to-top { position:fixed; top:0; left:0; right:0; z-index:6; background:linear-gradient(rgba(21,17,14,.55), transparent); }
+.to-overlay.room .to-dock { position:fixed; bottom:0; left:0; right:0; z-index:6; background:linear-gradient(transparent, rgba(21,17,14,.62)); padding-top:3.5rem; }
+.to-overlay.room .to-bar, .to-overlay.room .to-filter, .to-overlay.room .bag, .to-overlay.room .view, .to-overlay.room .to-hint { display:none; }
+.to-overlay.room .to-roomname { display:block; text-align:center; margin-bottom:.9rem; }
+.to-overlay.room .to-roomname .rn { font-family:var(--serif); font-size:1.4rem; color:var(--paper); }
+.to-overlay.room .to-strip { justify-content:center; }
+.to-overlay.room .to-thumb { background:rgba(246,243,237,.1); border-color:rgba(246,243,237,.15); backdrop-filter:blur(6px); }
+.to-overlay.room .to-thumb.on { border-color:var(--cognac); background:rgba(154,107,75,.2); }
+.to-overlay.room .to-actions { margin-top:.7rem; }
 
 /* ---- In-place try-on inside the product stage ---- */
 .pdp-stage { transition: background-color .55s ease; overflow:hidden; }

@@ -292,7 +292,10 @@ function buildOverlay() {
     <div class="to-top">
       <span class="brand">Aether <b>NY</b></span>
       <div class="to-title">Virtual Try-On<small>Live camera · 3D</small></div>
-      <button class="to-close" aria-label="Close try-on">✕</button>
+      <div class="to-topbtns">
+        <button class="to-room" aria-label="Toggle try-on room">Room</button>
+        <button class="to-close" aria-label="Close try-on">✕</button>
+      </div>
     </div>
     <div class="to-stage"><div class="to-view">
       <div class="to-hint">Center your face · turn slowly to see the fit</div>
@@ -316,6 +319,7 @@ function buildOverlay() {
         <button class="to-chip" data-f="eyeglasses">Eyeglasses</button>
         <button class="to-chip" data-f="sunglasses">Sunglasses</button>
       </div>
+      <div class="to-roomname"><span class="rn"></span></div>
       <div class="to-strip"></div>
       <div class="to-actions">
         <button class="btn btn-light bag">Add to bag</button>
@@ -338,6 +342,9 @@ function buildOverlay() {
   el.price = root.querySelector(".to-info2 .p");
   el.bag = root.querySelector(".bag");
   el.viewLink = root.querySelector(".view");
+  el.roomName = root.querySelector(".to-roomname .rn");
+  const roomBtn = root.querySelector(".to-room");
+  roomBtn.addEventListener("click", () => { roomBtn.textContent = el.root.classList.toggle("room") ? "Detailed" : "Room"; });
   root.querySelector(".to-close").addEventListener("click", closeOverlay);
   root.querySelector(".cap").addEventListener("click", () => capture(ovFrames[ovCurrent].id));
   el.bag.addEventListener("click", () => {
@@ -367,6 +374,7 @@ function ovSetCurrent(i) {
   ovCurrent = i; const f = ovFrames[i];
   el.eyebrow.textContent = (f.type === "sunglasses" ? "Sunglasses" : "Eyeglasses") + (f.shape ? " · " + f.shape : "");
   el.name.textContent = f.name;
+  el.roomName.textContent = f.name;
   el.cw.textContent = f.colorway;
   el.rating.innerHTML = f.rating ? `<span class="to-star">★</span> ${f.rating} <span class="to-rc">(${f.reviewCount})</span>` : "";
   el.price.textContent = "$" + f.price;
