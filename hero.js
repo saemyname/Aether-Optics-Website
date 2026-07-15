@@ -24,7 +24,7 @@ function init() {
   const rim = new THREE.DirectionalLight(0xffffff, 0.55); rim.position.set(-0.7, 0.3, -0.6); scene.add(rim);
   const pmrem = new THREE.PMREMGenerator(renderer);
   // Tilt the environment so the bright reflection sits lower on the lens.
-  const ENV_TILT = 1.2; // radians around X
+  const ENV_TILT = 1.5; // radians around X
   function buildEnv(tiltX) {
     const room = new RoomEnvironment(), envScene = new THREE.Scene(), g = new THREE.Group();
     g.rotation.x = tiltX;
