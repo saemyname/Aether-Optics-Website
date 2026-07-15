@@ -23,7 +23,17 @@ function init() {
   const key = new THREE.DirectionalLight(0xffffff, 1.35); key.position.set(0.5, 0.9, 1.1); scene.add(key);
   const rim = new THREE.DirectionalLight(0xffffff, 0.55); rim.position.set(-0.7, 0.3, -0.6); scene.add(rim);
   const pmrem = new THREE.PMREMGenerator(renderer);
-  scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+  // Tilt the environment so the bright reflection sits lower on the lens.
+  const ENV_TILT = 1.2; // radians around X
+  function buildEnv(tiltX) {
+    const room = new RoomEnvironment(), envScene = new THREE.Scene(), g = new THREE.Group();
+    g.rotation.x = tiltX;
+    while (room.children.length) g.add(room.children[0]);
+    envScene.add(g);
+    return pmrem.fromScene(envScene, 0.04).texture;
+  }
+  scene.environment = buildEnv(ENV_TILT);
+  window.AetherHero = { tilt: t => { scene.environment = buildEnv(t); } };
 
   const pivot = new THREE.Group();
   pivot.rotation.x = -0.08; // a touch of the top edge, for depth
