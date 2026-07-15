@@ -166,6 +166,6 @@ if (tryon) {
   const frames = (window.CATALOG || []).slice(0, 6).map(it => it.colorways[0].model);
   mountViewer(tryon, {
     frames, dots: document.getElementById("vpDots"),
-    margin: 1.7, autoRotate: false, yaw: -Math.PI / 4, pitch: -Math.PI / 4, dwell: 1500
+    margin: 1.7, autoRotate: false, yaw: -Math.PI / 4, pitch: -Math.PI / 9, dwell: 1500
   });
 }
