@@ -215,6 +215,26 @@ section { position: relative; }
 .chip.on { background: var(--ink); color: var(--paper); border-color: var(--ink); }
 .chip:hover:not(.on) { border-color: var(--ink); }
 
+/* ---- Shop toolbar: facets + sort + applied filters ---- */
+.shop-toolbar { display:flex; justify-content:space-between; align-items:flex-end; gap:1.4rem 2rem; flex-wrap:wrap; padding-bottom:1.5rem; border-bottom:1px solid var(--hairline); }
+.facets { display:flex; gap:1.6rem 2.2rem; flex-wrap:wrap; align-items:flex-end; }
+.facet { display:flex; flex-direction:column; gap:.6rem; }
+.facet-label { font-size:.62rem; letter-spacing:.18em; text-transform:uppercase; color:var(--stone); }
+.facet .chips { display:flex; gap:.45rem; flex-wrap:wrap; }
+.facet .chip { padding:.42rem .9rem; font-size:.8rem; }
+.swatches-row { display:flex; gap:.5rem; }
+.csw { width:26px; height:26px; border-radius:50%; border:1px solid var(--hairline); cursor:pointer; transition:transform .2s, box-shadow .2s; padding:0; }
+.csw:hover { transform:scale(1.12); }
+.csw.on { box-shadow:0 0 0 2px var(--paper), 0 0 0 4px var(--cognac); }
+.sort-select { font-family:var(--sans); font-weight:500; font-size:.82rem; color:var(--ink); padding:.5rem 2.1rem .5rem 1rem; border:1px solid var(--hairline); border-radius:999px; background-color:transparent; cursor:pointer; -webkit-appearance:none; appearance:none; background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6'><path d='M1 1l4 4 4-4' stroke='%238B8279' fill='none' stroke-width='1.4' stroke-linecap='round'/></svg>"); background-repeat:no-repeat; background-position:right .85rem center; }
+.applied { display:flex; gap:.5rem; flex-wrap:wrap; margin:1.4rem 0 0; }
+.applied:empty { margin:0; }
+.applied-chip { display:inline-flex; align-items:center; gap:.45rem; font-size:.76rem; padding:.34rem .5rem .34rem .8rem; border-radius:999px; background:var(--paper-warm); border:1px solid var(--hairline); color:var(--ink); cursor:pointer; transition:.2s; }
+.applied-chip:hover { border-color:var(--ink); }
+.applied-chip .x { display:inline-grid; place-items:center; width:15px; height:15px; border-radius:50%; background:var(--ink); color:var(--paper); font-size:.58rem; line-height:1; }
+.applied-clear { background:none; border:0; color:var(--cognac); font:600 .78rem var(--sans); cursor:pointer; padding:.34rem .3rem; letter-spacing:.02em; }
+.no-results { color:var(--stone); padding:3rem 0; font-size:.98rem; }
+
 /* ---- Story ---- */
 .story { padding: clamp(4rem,8vw,7rem) 0; }
 .story-grid { display:grid; grid-template-columns: 1fr 1fr; gap: 3.5rem; align-items:center; }

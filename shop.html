@@ -7,7 +7,7 @@
 <meta name="description" content="Shop Aether NY eyeglasses and sunglasses. Handmade acetate frames, try them on in AR before you buy.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="styles.css?v=1">
 <script type="importmap">
 {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}
 </script>
@@ -24,7 +24,7 @@
   <div class="nav-cta"><a class="link-arrow" href="index.html">Home <span>→</span></a><button class="nav-toggle" aria-label="Menu">☰</button></div>
 </header>
 
-<main class="wrap" style="padding-top:clamp(2.5rem,5vw,4.5rem);padding-bottom:2rem">
+<main class="wrap" style="padding-top:clamp(2.5rem,5vw,4.5rem);padding-bottom:4rem">
   <div class="section-head">
     <div>
       <span class="eyebrow accent">The Collection</span>
@@ -32,12 +32,45 @@
     </div>
     <p class="lede" id="count" style="max-width:22ch;text-align:right"></p>
   </div>
-  <div class="filter-bar" id="filters">
-    <button class="chip on" data-f="all">All</button>
-    <button class="chip" data-f="eyeglasses">Eyeglasses</button>
-    <button class="chip" data-f="sunglasses">Sunglasses</button>
+
+  <div class="shop-toolbar">
+    <div class="facets">
+      <div class="facet">
+        <span class="facet-label">Type</span>
+        <div class="chips" id="fType">
+          <button class="chip on" data-v="all">All</button>
+          <button class="chip" data-v="eyeglasses">Eyeglasses</button>
+          <button class="chip" data-v="sunglasses">Sunglasses</button>
+        </div>
+      </div>
+      <div class="facet">
+        <span class="facet-label">Shape</span>
+        <div class="chips" id="fShape">
+          <button class="chip on" data-v="all">All</button>
+          <button class="chip" data-v="cat-eye">Cat-eye</button>
+          <button class="chip" data-v="round">Round</button>
+          <button class="chip" data-v="square">Square</button>
+        </div>
+      </div>
+      <div class="facet">
+        <span class="facet-label">Colour</span>
+        <div class="swatches-row" id="fColour"></div>
+      </div>
+    </div>
+    <div class="facet">
+      <span class="facet-label">Sort</span>
+      <select class="sort-select" id="sort">
+        <option value="featured">Featured</option>
+        <option value="price-asc">Price — low to high</option>
+        <option value="price-desc">Price — high to low</option>
+        <option value="name">Name — A to Z</option>
+      </select>
+    </div>
   </div>
+
+  <div class="applied" id="applied"></div>
   <div class="grid shop" id="shopGrid"></div>
+  <p class="no-results" id="noResults" style="display:none">No frames match those filters. <button class="applied-clear" id="clearAll">Clear all filters →</button></p>
 </main>
 
 <footer class="footer">
@@ -59,20 +92,87 @@
 (function () {
   const grid = document.querySelector('#shopGrid');
   const count = document.querySelector('#count');
-  const chips = Array.from(document.querySelectorAll('#filters .chip'));
-  function render(f) {
-    const list = f === 'all' ? CATALOG : CATALOG.filter(i => i.type === f);
-    grid.innerHTML = list.map(window.AETHER.card).join('');
-    count.textContent = list.length + ' frames, ready to try on';
+  const applied = document.querySelector('#applied');
+  const noResults = document.querySelector('#noResults');
+  const COLOURS = { tortoise:'#8E6A5A', brown:'#C4A582', gold:'#A67B4F', green:'#6E7F5C', blue:'#7A93A7', red:'#7A2E39', black:'#3B2F2A' };
+  const CAP = s => s.charAt(0).toUpperCase() + s.slice(1);
+  const state = { type:'all', shape:'all', colours:new Set(), sort:'featured' };
+
+  // build colour swatches
+  document.querySelector('#fColour').innerHTML = Object.entries(COLOURS)
+    .map(([fam,hex]) => `<button class="csw" style="background:${hex}" data-v="${fam}" title="${CAP(fam)}" aria-label="${CAP(fam)}"></button>`).join('');
+
+  function matches(item) {
+    if (state.type !== 'all' && item.type !== state.type) return false;
+    if (state.shape !== 'all' && item.shape !== state.shape) return false;
+    if (state.colours.size && !item.colorways.some(c => state.colours.has(c.family))) return false;
+    return true;
   }
-  chips.forEach(c => c.addEventListener('click', () => {
-    chips.forEach(x => x.classList.toggle('on', x === c));
-    render(c.dataset.f);
+  function sortList(list) {
+    const s = state.sort;
+    if (s === 'price-asc') return [...list].sort((a,b) => a.price - b.price);
+    if (s === 'price-desc') return [...list].sort((a,b) => b.price - a.price);
+    if (s === 'name') return [...list].sort((a,b) => a.name.localeCompare(b.name));
+    return list; // featured = catalog order
+  }
+  function renderApplied() {
+    const chips = [];
+    if (state.type !== 'all') chips.push({ k:'type', label:'Type', val:CAP(state.type) });
+    if (state.shape !== 'all') chips.push({ k:'shape', label:'Shape', val:CAP(state.shape) });
+    state.colours.forEach(c => chips.push({ k:'colour', val2:c, label:'Colour', val:CAP(c) }));
+    applied.innerHTML = chips.map(c =>
+      `<button class="applied-chip" data-k="${c.k}" ${c.val2?`data-v="${c.val2}"`:''}><b>${c.label}:</b> ${c.val} <span class="x">✕</span></button>`).join('')
+      + (chips.length ? `<button class="applied-clear" id="clearInline">Clear all</button>` : '');
+  }
+  function render() {
+    const list = sortList(CATALOG.filter(matches));
+    grid.innerHTML = list.map(window.AETHER.card).join('');
+    count.textContent = list.length + (list.length === 1 ? ' frame' : ' frames') + ', ready to try on';
+    noResults.style.display = list.length ? 'none' : '';
+    renderApplied();
+  }
+
+  // type + shape chip groups (single-select)
+  ['#fType','#fShape'].forEach(sel => {
+    const key = sel === '#fType' ? 'type' : 'shape';
+    document.querySelectorAll(sel + ' .chip').forEach(b => b.addEventListener('click', () => {
+      state[key] = b.dataset.v;
+      document.querySelectorAll(sel + ' .chip').forEach(x => x.classList.toggle('on', x === b));
+      render();
+    }));
+  });
+  // colour swatches (multi-select toggle)
+  document.querySelectorAll('#fColour .csw').forEach(b => b.addEventListener('click', () => {
+    const fam = b.dataset.v;
+    if (state.colours.has(fam)) state.colours.delete(fam); else state.colours.add(fam);
+    b.classList.toggle('on');
+    render();
   }));
+  document.querySelector('#sort').addEventListener('change', e => { state.sort = e.target.value; render(); });
+
+  // remove individual applied filters + clear all
+  function clearAll() {
+    state.type = 'all'; state.shape = 'all'; state.colours.clear();
+    document.querySelectorAll('#fType .chip, #fShape .chip').forEach(x => x.classList.toggle('on', x.dataset.v === 'all'));
+    document.querySelectorAll('#fColour .csw').forEach(x => x.classList.remove('on'));
+    render();
+  }
+  applied.addEventListener('click', e => {
+    if (e.target.closest('#clearInline')) return clearAll();
+    const chip = e.target.closest('.applied-chip'); if (!chip) return;
+    const k = chip.dataset.k;
+    if (k === 'colour') { state.colours.delete(chip.dataset.v); document.querySelector(`#fColour .csw[data-v="${chip.dataset.v}"]`)?.classList.remove('on'); }
+    else { state[k] = 'all'; document.querySelectorAll(`#f${CAP(k)} .chip`).forEach(x => x.classList.toggle('on', x.dataset.v === 'all')); }
+    render();
+  });
+  document.querySelector('#clearAll').addEventListener('click', clearAll);
+
   // deep-link #sun → sunglasses
-  const start = location.hash === '#sun' ? 'sunglasses' : 'all';
-  chips.forEach(x => x.classList.toggle('on', x.dataset.f === start));
-  render(start);
+  if (location.hash === '#sun') {
+    state.type = 'sunglasses';
+    document.querySelectorAll('#fType .chip').forEach(x => x.classList.toggle('on', x.dataset.v === 'sunglasses'));
+  }
+  render();
 })();
 </script>
 <script type="module" src="tryon.js"></script>
