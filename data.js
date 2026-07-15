@@ -32,6 +32,31 @@ window.CATALOG = [
         ],
         "size": "narrow"
       }
+    ],
+    "rating": 4.3,
+    "reviewCount": 40,
+    "reviews": [
+      {
+        "name": "Maya R.",
+        "rating": 4,
+        "title": "Exactly the fit I hoped for",
+        "body": "The virtual try-on was spot on — they sit exactly like I saw on screen. Beautifully finished acetate.",
+        "months": 1
+      },
+      {
+        "name": "Daniel K.",
+        "rating": 5,
+        "title": "The try-on nailed it",
+        "body": "Ordered after trying them on my own face; the fit and proportions were perfect out of the box.",
+        "months": 3
+      },
+      {
+        "name": "Priya S.",
+        "rating": 5,
+        "title": "Compliments every day",
+        "body": "Feather-light and the hinges feel solid. I've been reaching for these over every other pair.",
+        "months": 5
+      }
     ]
   },
   {
@@ -63,6 +88,31 @@ window.CATALOG = [
         ],
         "size": "wide"
       }
+    ],
+    "rating": 4.5,
+    "reviewCount": 93,
+    "reviews": [
+      {
+        "name": "Jonah W.",
+        "rating": 5,
+        "title": "Lightweight and refined",
+        "body": "Colour is even richer in person. The temples are comfortable behind the ears all day.",
+        "months": 7
+      },
+      {
+        "name": "Elise M.",
+        "rating": 4,
+        "title": "My new everyday pair",
+        "body": "Sceptical about buying frames online, but the true-scale try-on made it effortless. No returns needed.",
+        "months": 9
+      },
+      {
+        "name": "Theo A.",
+        "rating": 5,
+        "title": "Better in person",
+        "body": "Elegant without trying too hard. The finishing on the rims is genuinely lovely.",
+        "months": 11
+      }
     ]
   },
   {
@@ -93,6 +143,31 @@ window.CATALOG = [
           }
         ],
         "size": "narrow"
+      }
+    ],
+    "rating": 4.7,
+    "reviewCount": 146,
+    "reviews": [
+      {
+        "name": "Camille B.",
+        "rating": 5,
+        "title": "Exactly the fit I hoped for",
+        "body": "The virtual try-on was spot on — they sit exactly like I saw on screen. Beautifully finished acetate.",
+        "months": 2
+      },
+      {
+        "name": "Noah L.",
+        "rating": 5,
+        "title": "The try-on nailed it",
+        "body": "Ordered after trying them on my own face; the fit and proportions were perfect out of the box.",
+        "months": 4
+      },
+      {
+        "name": "Ingrid V.",
+        "rating": 4,
+        "title": "Compliments every day",
+        "body": "Feather-light and the hinges feel solid. I've been reaching for these over every other pair.",
+        "months": 6
       }
     ]
   },
@@ -139,6 +214,31 @@ window.CATALOG = [
         ],
         "size": "wide"
       }
+    ],
+    "rating": 4.9,
+    "reviewCount": 199,
+    "reviews": [
+      {
+        "name": "Marcus T.",
+        "rating": 5,
+        "title": "Lightweight and refined",
+        "body": "Colour is even richer in person. The temples are comfortable behind the ears all day.",
+        "months": 8
+      },
+      {
+        "name": "Sofia D.",
+        "rating": 5,
+        "title": "My new everyday pair",
+        "body": "Sceptical about buying frames online, but the true-scale try-on made it effortless. No returns needed.",
+        "months": 10
+      },
+      {
+        "name": "Leo P.",
+        "rating": 5,
+        "title": "Better in person",
+        "body": "Elegant without trying too hard. The finishing on the rims is genuinely lovely.",
+        "months": 1
+      }
     ]
   },
   {
@@ -183,6 +283,31 @@ window.CATALOG = [
           }
         ],
         "size": "wide"
+      }
+    ],
+    "rating": 4.4,
+    "reviewCount": 72,
+    "reviews": [
+      {
+        "name": "Maya R.",
+        "rating": 4,
+        "title": "Exactly the fit I hoped for",
+        "body": "The virtual try-on was spot on — they sit exactly like I saw on screen. Beautifully finished acetate.",
+        "months": 3
+      },
+      {
+        "name": "Daniel K.",
+        "rating": 5,
+        "title": "The try-on nailed it",
+        "body": "Ordered after trying them on my own face; the fit and proportions were perfect out of the box.",
+        "months": 5
+      },
+      {
+        "name": "Priya S.",
+        "rating": 5,
+        "title": "Compliments every day",
+        "body": "Feather-light and the hinges feel solid. I've been reaching for these over every other pair.",
+        "months": 7
       }
     ]
   },
@@ -229,6 +354,31 @@ window.CATALOG = [
         ],
         "size": "wide"
       }
+    ],
+    "rating": 4.6,
+    "reviewCount": 125,
+    "reviews": [
+      {
+        "name": "Jonah W.",
+        "rating": 5,
+        "title": "Lightweight and refined",
+        "body": "Colour is even richer in person. The temples are comfortable behind the ears all day.",
+        "months": 9
+      },
+      {
+        "name": "Elise M.",
+        "rating": 4,
+        "title": "My new everyday pair",
+        "body": "Sceptical about buying frames online, but the true-scale try-on made it effortless. No returns needed.",
+        "months": 11
+      },
+      {
+        "name": "Theo A.",
+        "rating": 5,
+        "title": "Better in person",
+        "body": "Elegant without trying too hard. The finishing on the rims is genuinely lovely.",
+        "months": 2
+      }
     ]
   },
   {
@@ -273,6 +423,31 @@ window.CATALOG = [
           }
         ],
         "size": "wide"
+      }
+    ],
+    "rating": 4.8,
+    "reviewCount": 178,
+    "reviews": [
+      {
+        "name": "Camille B.",
+        "rating": 5,
+        "title": "Exactly the fit I hoped for",
+        "body": "The virtual try-on was spot on — they sit exactly like I saw on screen. Beautifully finished acetate.",
+        "months": 4
+      },
+      {
+        "name": "Noah L.",
+        "rating": 5,
+        "title": "The try-on nailed it",
+        "body": "Ordered after trying them on my own face; the fit and proportions were perfect out of the box.",
+        "months": 6
+      },
+      {
+        "name": "Ingrid V.",
+        "rating": 4,
+        "title": "Compliments every day",
+        "body": "Feather-light and the hinges feel solid. I've been reaching for these over every other pair.",
+        "months": 8
       }
     ]
   },
@@ -319,6 +494,31 @@ window.CATALOG = [
         ],
         "size": "wide"
       }
+    ],
+    "rating": 4.3,
+    "reviewCount": 51,
+    "reviews": [
+      {
+        "name": "Marcus T.",
+        "rating": 5,
+        "title": "Lightweight and refined",
+        "body": "Colour is even richer in person. The temples are comfortable behind the ears all day.",
+        "months": 10
+      },
+      {
+        "name": "Sofia D.",
+        "rating": 5,
+        "title": "My new everyday pair",
+        "body": "Sceptical about buying frames online, but the true-scale try-on made it effortless. No returns needed.",
+        "months": 1
+      },
+      {
+        "name": "Leo P.",
+        "rating": 5,
+        "title": "Better in person",
+        "body": "Elegant without trying too hard. The finishing on the rims is genuinely lovely.",
+        "months": 3
+      }
     ]
   },
   {
@@ -364,6 +564,31 @@ window.CATALOG = [
         ],
         "size": "wide"
       }
+    ],
+    "rating": 4.5,
+    "reviewCount": 104,
+    "reviews": [
+      {
+        "name": "Maya R.",
+        "rating": 4,
+        "title": "Exactly the fit I hoped for",
+        "body": "The virtual try-on was spot on — they sit exactly like I saw on screen. Beautifully finished acetate.",
+        "months": 5
+      },
+      {
+        "name": "Daniel K.",
+        "rating": 5,
+        "title": "The try-on nailed it",
+        "body": "Ordered after trying them on my own face; the fit and proportions were perfect out of the box.",
+        "months": 7
+      },
+      {
+        "name": "Priya S.",
+        "rating": 5,
+        "title": "Compliments every day",
+        "body": "Feather-light and the hinges feel solid. I've been reaching for these over every other pair.",
+        "months": 9
+      }
     ]
   },
   {
@@ -394,6 +619,31 @@ window.CATALOG = [
           }
         ],
         "size": "medium"
+      }
+    ],
+    "rating": 4.7,
+    "reviewCount": 157,
+    "reviews": [
+      {
+        "name": "Jonah W.",
+        "rating": 5,
+        "title": "Lightweight and refined",
+        "body": "Colour is even richer in person. The temples are comfortable behind the ears all day.",
+        "months": 11
+      },
+      {
+        "name": "Elise M.",
+        "rating": 4,
+        "title": "My new everyday pair",
+        "body": "Sceptical about buying frames online, but the true-scale try-on made it effortless. No returns needed.",
+        "months": 2
+      },
+      {
+        "name": "Theo A.",
+        "rating": 5,
+        "title": "Better in person",
+        "body": "Elegant without trying too hard. The finishing on the rims is genuinely lovely.",
+        "months": 4
       }
     ]
   },
@@ -440,6 +690,31 @@ window.CATALOG = [
         ],
         "size": "wide"
       }
+    ],
+    "rating": 4.9,
+    "reviewCount": 210,
+    "reviews": [
+      {
+        "name": "Camille B.",
+        "rating": 5,
+        "title": "Exactly the fit I hoped for",
+        "body": "The virtual try-on was spot on — they sit exactly like I saw on screen. Beautifully finished acetate.",
+        "months": 6
+      },
+      {
+        "name": "Noah L.",
+        "rating": 5,
+        "title": "The try-on nailed it",
+        "body": "Ordered after trying them on my own face; the fit and proportions were perfect out of the box.",
+        "months": 8
+      },
+      {
+        "name": "Ingrid V.",
+        "rating": 4,
+        "title": "Compliments every day",
+        "body": "Feather-light and the hinges feel solid. I've been reaching for these over every other pair.",
+        "months": 10
+      }
     ]
   },
   {
@@ -470,6 +745,31 @@ window.CATALOG = [
           }
         ],
         "size": "wide"
+      }
+    ],
+    "rating": 4.4,
+    "reviewCount": 83,
+    "reviews": [
+      {
+        "name": "Marcus T.",
+        "rating": 5,
+        "title": "Lightweight and refined",
+        "body": "Colour is even richer in person. The temples are comfortable behind the ears all day.",
+        "months": 1
+      },
+      {
+        "name": "Sofia D.",
+        "rating": 5,
+        "title": "My new everyday pair",
+        "body": "Sceptical about buying frames online, but the true-scale try-on made it effortless. No returns needed.",
+        "months": 3
+      },
+      {
+        "name": "Leo P.",
+        "rating": 5,
+        "title": "Better in person",
+        "body": "Elegant without trying too hard. The finishing on the rims is genuinely lovely.",
+        "months": 5
       }
     ]
   },
@@ -515,6 +815,31 @@ window.CATALOG = [
           }
         ],
         "size": "narrow"
+      }
+    ],
+    "rating": 4.6,
+    "reviewCount": 136,
+    "reviews": [
+      {
+        "name": "Maya R.",
+        "rating": 4,
+        "title": "Exactly the fit I hoped for",
+        "body": "The virtual try-on was spot on — they sit exactly like I saw on screen. Beautifully finished acetate.",
+        "months": 7
+      },
+      {
+        "name": "Daniel K.",
+        "rating": 5,
+        "title": "The try-on nailed it",
+        "body": "Ordered after trying them on my own face; the fit and proportions were perfect out of the box.",
+        "months": 9
+      },
+      {
+        "name": "Priya S.",
+        "rating": 5,
+        "title": "Compliments every day",
+        "body": "Feather-light and the hinges feel solid. I've been reaching for these over every other pair.",
+        "months": 11
       }
     ]
   }

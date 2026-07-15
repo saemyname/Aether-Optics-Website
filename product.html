@@ -6,7 +6,7 @@
 <title>Frame — Aether NY</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="styles.css?v=3">
+<link rel="stylesheet" href="styles.css?v=4">
 <script type="importmap">
 {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}
 </script>
@@ -25,6 +25,14 @@
 
 <main class="wrap pdp" id="pdp"><!-- rendered --></main>
 
+<section class="pdp-reviews wrap" id="reviews" style="display:none">
+  <div class="section-head">
+    <div><span class="eyebrow accent">Reviews</span><h2>What wearers say</h2></div>
+    <div class="reviews-summary" id="revSummary"></div>
+  </div>
+  <div class="reviews-grid" id="revGrid"></div>
+</section>
+
 <section class="pdp-related wrap" id="related" style="display:none">
   <div class="section-head"><div><span class="eyebrow accent">Keep looking</span><h2>You may also like</h2></div></div>
   <div class="grid" id="relatedGrid"></div>
@@ -38,8 +46,8 @@
   </div>
 </footer>
 
-<script src="data.js"></script>
-<script src="main.js"></script>
+<script src="data.js?v=1"></script>
+<script src="main.js?v=1"></script>
 <script>
 (function () {
   const id = new URLSearchParams(location.search).get('id');
@@ -72,6 +80,7 @@
         <span class="eyebrow accent pdp-type">${typeLabel} · ${item.shape || 'acetate'}</span>
         <h1 class="display">${item.name}</h1>
         <p class="pdp-price">$${item.price}</p>
+        ${item.rating ? `<a class="rating-badge" href="#reviews">${window.AETHER.stars(item.rating)} <b>${item.rating}</b> <span>· ${item.reviewCount} reviews</span></a>` : ''}
         <p class="pdp-desc">${item.description}</p>
         <span class="eyebrow pdp-label">Colour — <span id="cwCount">${item.colorways.length}</span></span>
         <div class="pdp-colorways" id="cwRow">${cwButtons}</div>
@@ -174,6 +183,20 @@
   document.querySelector('#addBag').addEventListener('click', () => {
     window.AetherBag?.add({ id: item.id, name: item.name, price: item.price, image: curCw.image, colorway: curCw.name, size: curSize });
   });
+
+  // reviews
+  if (item.reviews && item.reviews.length) {
+    document.querySelector('#reviews').style.display = '';
+    document.querySelector('#revSummary').innerHTML =
+      `<span class="big">${item.rating}</span>${window.AETHER.stars(item.rating)}<span class="n">Based on ${item.reviewCount} reviews</span>`;
+    document.querySelector('#revGrid').innerHTML = item.reviews.map(r => `
+      <div class="review-card">
+        ${window.AETHER.stars(r.rating)}
+        <h4>${r.title}</h4>
+        <p>“${r.body}”</p>
+        <div class="meta"><b>${r.name}</b> · ${r.months === 1 ? '1 month' : r.months + ' months'} ago · Verified buyer</div>
+      </div>`).join('');
+  }
 
   // related — same type, others
   const rel = (window.CATALOG || []).filter(i => i.id !== item.id && i.type === item.type).slice(0, 3);

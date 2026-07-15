@@ -305,6 +305,30 @@ section { position: relative; }
 .checkout-empty { text-align:center; padding:4rem 0; color:var(--stone); }
 @media (max-width:820px){ .checkout-grid { grid-template-columns:1fr; } .checkout-summary { position:static; order:-1; margin-bottom:1rem; } .co-row2 { grid-template-columns:1fr; } }
 
+/* ---- Star ratings + reviews ---- */
+.stars { position:relative; display:inline-block; line-height:1; font-size:.9rem; letter-spacing:.08em; }
+.stars::before { content:"★★★★★"; color:var(--hairline); }
+.stars > i { position:absolute; left:0; top:0; overflow:hidden; white-space:nowrap; color:var(--cognac); }
+.stars > i::before { content:"★★★★★"; }
+.rating-badge { display:inline-flex; align-items:center; gap:.5rem; margin:.2rem 0 1.1rem; color:var(--stone); font-size:.9rem; text-decoration:none; }
+.rating-badge b { color:var(--ink); font-weight:600; }
+.rating-badge:hover { color:var(--ink); }
+.card-rating { display:inline-flex; align-items:center; gap:.35rem; font-size:.76rem; color:var(--stone); margin-top:.55rem; }
+.card-rating .stars { font-size:.72rem; }
+.pdp-reviews { padding:clamp(3rem,6vw,5rem) 0; border-top:1px solid var(--hairline); }
+.reviews-summary { display:flex; align-items:center; gap:1rem; }
+.reviews-summary .big { font-family:var(--serif); font-size:2.4rem; line-height:1; }
+.reviews-summary .stars { font-size:1.05rem; }
+.reviews-summary span.n { color:var(--stone); font-size:.9rem; }
+.reviews-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.4rem; }
+.review-card { background:var(--card); border:1px solid var(--hairline-soft); border-radius:16px; padding:1.5rem; }
+.review-card .stars { font-size:.82rem; margin-bottom:.85rem; }
+.review-card h4 { font-family:var(--serif); font-weight:400; font-size:1.12rem; margin-bottom:.5rem; }
+.review-card p { color:var(--stone); font-size:.92rem; line-height:1.55; margin-bottom:1.1rem; }
+.review-card .meta { font-size:.8rem; color:var(--stone); }
+.review-card .meta b { color:var(--ink); font-weight:600; }
+@media (max-width:820px){ .reviews-grid { grid-template-columns:1fr; } }
+
 /* ---- Story ---- */
 .story { padding: clamp(4rem,8vw,7rem) 0; }
 .story-grid { display:grid; grid-template-columns: 1fr 1fr; gap: 3.5rem; align-items:center; }
