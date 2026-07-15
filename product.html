@@ -6,7 +6,7 @@
 <title>Frame — Aether NY</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="styles.css?v=1">
+<link rel="stylesheet" href="styles.css?v=3">
 <script type="importmap">
 {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}
 </script>
@@ -80,7 +80,7 @@
         <div class="pdp-sizes" id="sizeRow"></div>
         <div class="pdp-actions">
           <button class="btn btn-primary" id="tryOnBtn">Try on — live camera</button>
-          <a class="btn btn-ghost" href="#">Add to bag — $${item.price}</a>
+          <button class="btn btn-ghost" id="addBag">Add to bag — $${item.price}</button>
         </div>
         <div class="measure">
           <div><div class="v">${s.lensWidth ?? '—'}</div><div class="l">Lens</div></div>
@@ -169,6 +169,12 @@
   document.querySelector('#camClose').addEventListener('click', exitTryOn);
   document.querySelector('#camCap').addEventListener('click', () => window.AetherTryOn.engine.capture(item.id));
   window.addEventListener('beforeunload', () => { if (tryingOn) window.AetherTryOn.engine.stop(); });
+
+  // add to bag — current colour + size
+  document.querySelector('#addBag').addEventListener('click', () => {
+    window.AetherBag?.add({ id: item.id, name: item.name, price: item.price, image: curCw.image, colorway: curCw.name, size: curSize });
+  });
+
   // related — same type, others
   const rel = (window.CATALOG || []).filter(i => i.id !== item.id && i.type === item.type).slice(0, 3);
   if (rel.length) {
@@ -178,5 +184,6 @@
 })();
 </script>
 <script type="module" src="tryon.js"></script>
+<script type="module" src="cart.js"></script>
 </body>
 </html>

@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Checkout — Aether NY</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="styles.css?v=3">
+</head>
+<body>
+<header class="nav">
+  <a class="brand" href="index.html">Aether <b>NY</b></a>
+  <nav class="nav-links">
+    <a href="shop.html">Eyeglasses</a>
+    <a href="shop.html#sun">Sunglasses</a>
+    <a href="index.html#tryon">Virtual Try-On</a>
+    <a href="index.html#story">Our Story</a>
+  </nav>
+  <div class="nav-cta"><a class="link-arrow" href="shop.html">Shop all <span>→</span></a><button class="nav-toggle" aria-label="Menu">☰</button></div>
+</header>
+
+<main class="wrap checkout" id="coMain">
+  <a class="crumb" href="shop.html">← Continue shopping</a>
+
+  <div class="checkout-grid" id="coGrid">
+    <div class="checkout-form">
+      <h1 class="display">Checkout</h1>
+      <form id="coForm" novalidate>
+        <fieldset class="co-fieldset">
+          <legend class="eyebrow accent">Contact</legend>
+          <div class="co-field"><label for="coEmail">Email</label><input id="coEmail" type="email" autocomplete="email" placeholder="you@example.com" required></div>
+        </fieldset>
+        <fieldset class="co-fieldset">
+          <legend class="eyebrow accent">Shipping address</legend>
+          <div class="co-field"><label for="coName">Full name</label><input id="coName" autocomplete="name" required></div>
+          <div class="co-field"><label for="coAddr">Address</label><input id="coAddr" autocomplete="address-line1" required></div>
+          <div class="co-row2">
+            <div class="co-field"><label for="coCity">City</label><input id="coCity" autocomplete="address-level2" required></div>
+            <div class="co-field"><label for="coZip">Postal code</label><input id="coZip" autocomplete="postal-code" required></div>
+          </div>
+          <div class="co-field"><label for="coCountry">Country</label>
+            <select id="coCountry" class="sort-select" style="border-radius:12px;padding:.8rem 2.1rem .8rem .9rem;background-color:var(--card)">
+              <option>United States</option><option>Canada</option><option>United Kingdom</option><option>Australia</option><option>South Korea</option>
+            </select>
+          </div>
+        </fieldset>
+        <fieldset class="co-fieldset">
+          <legend class="eyebrow accent">Payment</legend>
+          <p class="co-note">This is a portfolio concept — no payment is collected and nothing is shipped. Placing the order just shows the confirmation flow.</p>
+        </fieldset>
+        <button class="btn btn-primary co-place" type="submit">Place order</button>
+      </form>
+    </div>
+
+    <aside class="checkout-summary">
+      <h3>Order summary</h3>
+      <div id="coItems"></div>
+      <div class="co-totals">
+        <div class="bag-row"><span>Subtotal</span><span id="coSub"></span></div>
+        <div class="bag-row muted"><span>Shipping</span><span id="coShip"></span></div>
+        <div class="bag-row total"><span>Total</span><span id="coTotal"></span></div>
+      </div>
+    </aside>
+  </div>
+
+  <div class="checkout-empty" id="coEmpty" style="display:none">
+    <p class="lede">Your bag is empty.</p>
+    <a class="btn btn-primary" href="shop.html" style="margin-top:1.5rem">Shop the collection</a>
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer-fine"><span>© 2026 Aether NY. A portfolio concept.</span><span><a href="shop.html">Shop all frames →</a></span></div>
+  </div>
+</footer>
+
+<script src="cart.js" type="module"></script>
+<script>
+(function () {
+  const KEY = 'aether-bag', FREE = 200, FEE = 15;
+  const money = n => '$' + n.toFixed(0);
+  const cap = s => s ? s.charAt(0).toUpperCase() + s.slice(1) : '';
+  const read = () => { try { return JSON.parse(localStorage.getItem(KEY)) || []; } catch { return []; } };
+  const grid = document.querySelector('#coGrid'), empty = document.querySelector('#coEmpty');
+
+  function render() {
+    const items = read();
+    if (!items.length) { grid.style.display = 'none'; empty.style.display = ''; return; }
+    grid.style.display = ''; empty.style.display = 'none';
+    document.querySelector('#coItems').innerHTML = items.map(i => `
+      <div class="co-item">
+        <div class="bag-thumb"><img src="${i.image}" alt=""></div>
+        <div class="co-item-info"><div class="n">${i.name}${i.qty > 1 ? ` ×${i.qty}` : ''}</div><div class="m">${i.colorway}${i.size ? ' · ' + cap(i.size) : ''}</div></div>
+        <span class="p">${money(i.price * i.qty)}</span>
+      </div>`).join('');
+    const sub = items.reduce((s, i) => s + i.price * i.qty, 0), ship = sub < FREE ? FEE : 0;
+    document.querySelector('#coSub').textContent = money(sub);
+    document.querySelector('#coShip').textContent = ship ? money(ship) : 'Free';
+    document.querySelector('#coTotal').textContent = money(sub + ship);
+  }
+  render();
+
+  document.querySelector('#coForm').addEventListener('submit', e => {
+    e.preventDefault();
+    if (!e.target.checkValidity()) { e.target.reportValidity(); return; }
+    const email = document.querySelector('#coEmail').value;
+    window.AetherBag?.clear();
+    const main = document.querySelector('#coMain');
+    main.innerHTML = `<div class="co-done">
+      <div class="check">✓</div>
+      <h1 class="display">Order placed</h1>
+      <p class="lede">Thank you — a confirmation is on its way to <b id="coEmailOut"></b>. Your frames would ship within two business days.</p>
+      <p class="co-note" style="margin-top:1.5rem;display:inline-block">This is a portfolio concept — no payment was collected and nothing was shipped.</p>
+      <div style="margin-top:2rem"><a class="btn btn-primary" href="shop.html">Continue shopping</a></div>
+    </div>`;
+    document.querySelector('#coEmailOut').textContent = email || 'your inbox';
+    window.scrollTo(0, 0);
+  });
+})();
+</script>
+</body>
+</html>
