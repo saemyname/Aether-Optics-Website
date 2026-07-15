@@ -51,12 +51,12 @@ function mountViewer(mount, opts) {
   scene.environmentIntensity = 2.3;
 
   const pivot = new THREE.Group();
-  pivot.rotation.x = -0.08; // a touch of the top edge, for depth
+  pivot.rotation.x = opts.pitch ?? -0.08; // tilt (see the top edge)
   scene.add(pivot);
 
   // drag to spin; gentle auto-drift when idle
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  let angle = 0, dragging = false, lastX = 0, idleUntil = 0;
+  let angle = opts.yaw || 0, dragging = false, lastX = 0, idleUntil = 0;
   mount.addEventListener("pointerdown", e => { dragging = true; lastX = e.clientX; mount.setPointerCapture(e.pointerId); mount.classList.add("grab", "touched"); });
   mount.addEventListener("pointermove", e => { if (!dragging) return; angle += (e.clientX - lastX) * 0.01; lastX = e.clientX; });
   const end = () => { if (!dragging) return; dragging = false; idleUntil = performance.now() + 2600; mount.classList.remove("grab"); };
@@ -72,7 +72,7 @@ function mountViewer(mount, opts) {
   new ResizeObserver(resize).observe(mount);
   function fitCam(root) {
     const s = root.userData.size;
-    dist = (Math.max(s.x, s.y) / 2) / FOV_T * 1.45;
+    dist = (Math.max(s.x, s.y) / 2) / FOV_T * (opts.margin || 1.45);
     cam.position.set(0, 0, dist); cam.lookAt(0, 0, 0);
     resize();
   }
@@ -89,7 +89,7 @@ function mountViewer(mount, opts) {
 
     const planeAbove = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);  // keep y > line
     const planeBelow = new THREE.Plane(new THREE.Vector3(0, -1, 0), 0); // keep y < line
-    const DWELL = 2600, SWEEP = 1400;
+    const DWELL = opts.dwell || 2600, SWEEP = 1400;
     let curIdx = 0, targetIdx = 1, modelA = null, modelB = null, phase = "load", phaseStart = 0;
 
     loadModel(opts.frames[0]).then(r => {
@@ -149,7 +149,7 @@ function mountViewer(mount, opts) {
   (function loop() {
     requestAnimationFrame(loop);
     const t = performance.now();
-    if (!dragging && t > idleUntil && !reduce) {
+    if (opts.autoRotate !== false && !dragging && t > idleUntil && !reduce) {
       const target = Math.sin(t * 0.00042) * 0.55; // slow ±32° sweep
       angle += (target - angle) * 0.02;
     }
@@ -164,5 +164,8 @@ if (hero) mountViewer(hero, { model: "assets/GLB/cicely-opt-sbf-lavender-tortois
 const tryon = document.getElementById("tryon3d");
 if (tryon) {
   const frames = (window.CATALOG || []).slice(0, 6).map(it => it.colorways[0].model);
-  mountViewer(tryon, { frames, dots: document.getElementById("vpDots") });
+  mountViewer(tryon, {
+    frames, dots: document.getElementById("vpDots"),
+    margin: 1.7, autoRotate: false, yaw: -Math.PI / 4, pitch: -Math.PI / 4, dwell: 1500
+  });
 }
