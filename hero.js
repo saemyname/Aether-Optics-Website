@@ -1,14 +1,13 @@
-/* Aether NY — hero 3D frame. The signature Cicely renders live in the lens
-   circle: it drifts with a slow turn to show its form, and you can grab and
-   spin it a full turn. Same lighting as the try-on so the acetate reads rich. */
+/* Aether NY — reusable 3D frame viewer. Drives the hero lens circle and the
+   try-on section viewport: each frame drifts with a slow turn to show its form,
+   and you can grab and spin it. Studio "lightbox" lighting bakes crisp
+   reflections onto the acetate and metal. */
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 
-const MODEL = "assets/GLB/cicely-opt-sbf-lavender-tortoise-with-riesling_wide.glb";
-const mount = document.getElementById("hero3d");
-if (mount) init();
+const loader = new GLTFLoader();
 
-function init() {
+function mountViewer(mount, modelUrl) {
   const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
   renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -21,34 +20,28 @@ function init() {
   scene.add(new THREE.AmbientLight(0xffffff, 0.55));
   const key = new THREE.DirectionalLight(0xffffff, 1.35); key.position.set(0.5, 0.9, 1.1); scene.add(key);
   const rim = new THREE.DirectionalLight(0xffffff, 0.55); rim.position.set(-0.7, 0.3, -0.6); scene.add(rim);
+
+  // A small studio "lightbox": bright softbox panels on a dark surround → crisp,
+  // sparkly reflections, with a soft catch-light band across the lenses.
   const pmrem = new THREE.PMREMGenerator(renderer);
-  // A small studio "lightbox": bright softbox panels on a dark surround bake
-  // into an environment whose crisp reflections read as sparkle on the acetate
-  // and metal. Tilt drops the reflection lower on the lens.
-  const ENV_TILT = 0; // radians around X — 0 keeps the catch-light up on the lens
-  function buildEnv(tiltX) {
-    const envScene = new THREE.Scene();
-    envScene.background = new THREE.Color(0x13131a); // dark surround → high-contrast highlights
-    const g = new THREE.Group(); g.rotation.x = tiltX; envScene.add(g);
-    const panel = (x, y, z, w, h, i) => {
-      const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ side: THREE.DoubleSide }));
-      m.material.color.setScalar(i); m.position.set(x, y, z); m.lookAt(0, 0, 0); g.add(m);
-    };
-    panel(0, 1.5, 2.6, 5, 1.7, 7);      // wide top strip → bright band across the lenses
-    panel(-2.4, 1.0, 1.8, 2.6, 2.6, 3.4); // key softbox
-    panel(2.4, 0.4, 1.6, 1.6, 4, 2.4);  // side strip
-    panel(0, -2.2, 1.4, 4, 1.8, 1.4);   // lower fill
-    return pmrem.fromScene(envScene, 0.02).texture;
-  }
-  scene.environment = buildEnv(ENV_TILT);
+  const envScene = new THREE.Scene();
+  envScene.background = new THREE.Color(0x13131a);
+  const panel = (x, y, z, w, h, i) => {
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ side: THREE.DoubleSide }));
+    m.material.color.setScalar(i); m.position.set(x, y, z); m.lookAt(0, 0, 0); envScene.add(m);
+  };
+  panel(0, 1.5, 2.6, 5, 1.7, 7);      // wide top strip → bright band across the lenses
+  panel(-2.4, 1.0, 1.8, 2.6, 2.6, 3.4); // key softbox
+  panel(2.4, 0.4, 1.6, 1.6, 4, 2.4);  // side strip
+  panel(0, -2.2, 1.4, 4, 1.8, 1.4);   // lower fill
+  scene.environment = pmrem.fromScene(envScene, 0.02).texture;
   scene.environmentIntensity = 2.3;
-  window.AetherHero = { tilt: t => { scene.environment = buildEnv(t); } };
 
   const pivot = new THREE.Group();
   pivot.rotation.x = -0.08; // a touch of the top edge, for depth
   scene.add(pivot);
 
-  new GLTFLoader().load(MODEL, gltf => {
+  loader.load(modelUrl, gltf => {
     const model = gltf.scene;
     const box = new THREE.Box3().setFromObject(model);
     model.position.sub(box.getCenter(new THREE.Vector3())); // centre on origin
@@ -94,3 +87,8 @@ function init() {
     renderer.render(scene, cam);
   })();
 }
+
+const hero = document.getElementById("hero3d");
+if (hero) mountViewer(hero, "assets/GLB/cicely-opt-sbf-lavender-tortoise-with-riesling_wide.glb");
+const tryon = document.getElementById("tryon3d");
+if (tryon) mountViewer(tryon, "assets/GLB/carson-sun-sbf-chai-crystal-fade_wide.glb");

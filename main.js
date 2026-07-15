@@ -28,25 +28,7 @@
     grid.innerHTML = CATALOG.slice(0, 3).map(card).join('');
   }
 
-  /* ---- Home: try-on viewport cycling ---- */
-  const vp = $('#viewport');
-  if (vp && window.CATALOG) {
-    const picks = CATALOG.slice(0, 6);
-    const img = $('#vpFrame'), dots = $('#vpDots');
-    let i = 0, timer;
-    dots.innerHTML = picks.map((_, k) => `<button aria-label="Frame ${k + 1}"></button>`).join('');
-    const dotEls = $$('button', dots);
-    function show(n) {
-      i = n;
-      img.style.opacity = 0;
-      setTimeout(() => { img.src = picks[i].colorways[0].image; img.alt = picks[i].name + ' previewed on face'; img.style.opacity = 1; }, 220);
-      dotEls.forEach((d, k) => d.classList.toggle('on', k === i));
-    }
-    function next() { show((i + 1) % picks.length); }
-    dotEls.forEach((d, k) => d.addEventListener('click', () => { show(k); restart(); }));
-    function restart() { clearInterval(timer); timer = setInterval(next, 2600); }
-    show(0); restart();
-  }
+  /* Try-on viewport now renders a live 3D frame (hero.js) — no PNG cycling. */
 
   /* ---- Scroll reveals ---- */
   const io = new IntersectionObserver((entries) => {
