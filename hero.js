@@ -163,7 +163,17 @@ if (hero) mountViewer(hero, { model: "assets/GLB/cicely-opt-sbf-lavender-tortois
 
 const tryon = document.getElementById("tryon3d");
 if (tryon) {
-  const frames = (window.CATALOG || []).slice(0, 6).map(it => it.colorways[0].model);
+  // curated slideshow — id + colourway index
+  const wanted = [
+    ["blakeley-opt", 0], // Smoky Mauve Tortoise
+    ["brimmer-sun", 0],  // Harbor Crystal
+    ["carlton-opt", 0],  // Seaweed Crystal
+    ["winston-opt", 0],  // Black Oak Tortoise
+    ["carson-sun", 0],   // Chai Crystal Fade
+    ["cicely-opt", 0],   // Lavender Tortoise
+  ];
+  const cat = window.CATALOG || [];
+  const frames = wanted.map(([id, cw]) => cat.find(i => i.id === id)?.colorways[cw]?.model).filter(Boolean);
   mountViewer(tryon, {
     frames, dots: document.getElementById("vpDots"),
     margin: 1.7, autoRotate: false, yaw: -Math.PI * 40 / 180, pitch: -Math.PI / 9, dwell: 1500
