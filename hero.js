@@ -3,7 +3,6 @@
    spin it a full turn. Same lighting as the try-on so the acetate reads rich. */
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
-import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 
 const MODEL = "assets/GLB/cicely-opt-sbf-lavender-tortoise-with-riesling_wide.glb";
 const mount = document.getElementById("hero3d");
@@ -14,7 +13,7 @@ function init() {
   renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.25;
+  renderer.toneMappingExposure = 1.3;
   mount.appendChild(renderer.domElement);
 
   const scene = new THREE.Scene();
@@ -23,16 +22,25 @@ function init() {
   const key = new THREE.DirectionalLight(0xffffff, 1.35); key.position.set(0.5, 0.9, 1.1); scene.add(key);
   const rim = new THREE.DirectionalLight(0xffffff, 0.55); rim.position.set(-0.7, 0.3, -0.6); scene.add(rim);
   const pmrem = new THREE.PMREMGenerator(renderer);
-  // Tilt the environment so the bright reflection sits lower on the lens.
+  // A small studio "lightbox": bright softbox panels on a dark surround bake
+  // into an environment whose crisp reflections read as sparkle on the acetate
+  // and metal. Tilt drops the reflection lower on the lens.
   const ENV_TILT = 1.5; // radians around X
   function buildEnv(tiltX) {
-    const room = new RoomEnvironment(), envScene = new THREE.Scene(), g = new THREE.Group();
-    g.rotation.x = tiltX;
-    while (room.children.length) g.add(room.children[0]);
-    envScene.add(g);
-    return pmrem.fromScene(envScene, 0.04).texture;
+    const envScene = new THREE.Scene();
+    envScene.background = new THREE.Color(0x13131a); // dark surround → high-contrast highlights
+    const g = new THREE.Group(); g.rotation.x = tiltX; envScene.add(g);
+    const panel = (x, y, z, w, h, i) => {
+      const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ side: THREE.DoubleSide }));
+      m.material.color.setScalar(i); m.position.set(x, y, z); m.lookAt(0, 0, 0); g.add(m);
+    };
+    panel(-2.4, 1.8, 2.0, 3, 3, 3.6);   // key softbox
+    panel(2.4, 0.5, 1.6, 1.6, 4, 2.3);  // side strip
+    panel(0, -2.2, 1.4, 4, 1.8, 1.5);   // lower fill
+    return pmrem.fromScene(envScene, 0.02).texture;
   }
   scene.environment = buildEnv(ENV_TILT);
+  scene.environmentIntensity = 1.4;
   window.AetherHero = { tilt: t => { scene.environment = buildEnv(t); } };
 
   const pivot = new THREE.Group();
