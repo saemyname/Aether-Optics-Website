@@ -25,7 +25,7 @@ function init() {
   // A small studio "lightbox": bright softbox panels on a dark surround bake
   // into an environment whose crisp reflections read as sparkle on the acetate
   // and metal. Tilt drops the reflection lower on the lens.
-  const ENV_TILT = 1.5; // radians around X
+  const ENV_TILT = 0; // radians around X — 0 keeps the catch-light up on the lens
   function buildEnv(tiltX) {
     const envScene = new THREE.Scene();
     envScene.background = new THREE.Color(0x13131a); // dark surround → high-contrast highlights
@@ -34,13 +34,14 @@ function init() {
       const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ side: THREE.DoubleSide }));
       m.material.color.setScalar(i); m.position.set(x, y, z); m.lookAt(0, 0, 0); g.add(m);
     };
-    panel(-2.4, 1.8, 2.0, 3, 3, 3.6);   // key softbox
-    panel(2.4, 0.5, 1.6, 1.6, 4, 2.3);  // side strip
-    panel(0, -2.2, 1.4, 4, 1.8, 1.5);   // lower fill
+    panel(0, 1.5, 2.6, 5, 1.7, 7);      // wide top strip → bright band across the lenses
+    panel(-2.4, 1.0, 1.8, 2.6, 2.6, 3.4); // key softbox
+    panel(2.4, 0.4, 1.6, 1.6, 4, 2.4);  // side strip
+    panel(0, -2.2, 1.4, 4, 1.8, 1.4);   // lower fill
     return pmrem.fromScene(envScene, 0.02).texture;
   }
   scene.environment = buildEnv(ENV_TILT);
-  scene.environmentIntensity = 1.4;
+  scene.environmentIntensity = 2.3;
   window.AetherHero = { tilt: t => { scene.environment = buildEnv(t); } };
 
   const pivot = new THREE.Group();
