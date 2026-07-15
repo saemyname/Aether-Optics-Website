@@ -1,13 +1,25 @@
-/* Aether NY — reusable 3D frame viewer. Drives the hero lens circle and the
-   try-on section viewport: each frame drifts with a slow turn to show its form,
-   and you can grab and spin it. Studio "lightbox" lighting bakes crisp
-   reflections onto the acetate and metal. */
+/* Aether NY — reusable 3D frame viewer. Drives the hero lens circle (a single
+   frame) and the try-on section viewport (cycles through frames like a slide
+   show). Each frame drifts with a slow turn and can be grabbed and spun.
+   Studio "lightbox" lighting bakes crisp reflections onto the acetate & metal. */
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 
 const loader = new GLTFLoader();
+const cache = new Map();
+function loadModel(url) {
+  if (cache.has(url)) return Promise.resolve(cache.get(url));
+  return loader.loadAsync(url).then(gltf => {
+    const root = gltf.scene;
+    const box = new THREE.Box3().setFromObject(root);
+    root.position.sub(box.getCenter(new THREE.Vector3())); // centre on origin
+    root.userData.size = box.getSize(new THREE.Vector3());
+    cache.set(url, root);
+    return root;
+  });
+}
 
-function mountViewer(mount, modelUrl) {
+function mountViewer(mount, opts) {
   const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
   renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -41,18 +53,14 @@ function mountViewer(mount, modelUrl) {
   pivot.rotation.x = -0.08; // a touch of the top edge, for depth
   scene.add(pivot);
 
-  loader.load(modelUrl, gltf => {
-    const model = gltf.scene;
-    const box = new THREE.Box3().setFromObject(model);
-    model.position.sub(box.getCenter(new THREE.Vector3())); // centre on origin
-    pivot.add(model);
-    const size = box.getSize(new THREE.Vector3());
+  function swapModel(root) {
+    while (pivot.children.length) pivot.remove(pivot.children[0]);
+    pivot.add(root);
+    const size = root.userData.size;
     const dist = (Math.max(size.x, size.y) / 2) / Math.tan((cam.fov * Math.PI / 180) / 2) * 1.45;
-    cam.position.set(0, 0, dist);
-    cam.lookAt(0, 0, 0);
+    cam.position.set(0, 0, dist); cam.lookAt(0, 0, 0);
     resize();
-    mount.classList.add("ready");
-  });
+  }
 
   // drag to spin; gentle auto-drift when idle
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -86,9 +94,38 @@ function mountViewer(mount, modelUrl) {
     pivot.rotation.y = angle;
     renderer.render(scene, cam);
   })();
+
+  // ── content: a single frame, or a cycling slideshow ──
+  if (opts.frames && opts.frames.length) {
+    const dotsEl = opts.dots;
+    let i = 0, timer;
+    if (dotsEl) {
+      dotsEl.innerHTML = opts.frames.map((_, k) => `<button aria-label="Frame ${k + 1}"></button>`).join("");
+    }
+    const dotBtns = dotsEl ? [...dotsEl.querySelectorAll("button")] : [];
+    function show(n) {
+      i = n;
+      dotBtns.forEach((d, k) => d.classList.toggle("on", k === i));
+      mount.style.opacity = 0;
+      loadModel(opts.frames[i]).then(root => {
+        if (i !== n) return; // superseded
+        swapModel(root); mount.classList.add("ready"); mount.style.opacity = 1;
+      });
+    }
+    const next = () => show((i + 1) % opts.frames.length);
+    const restart = () => { clearInterval(timer); timer = setInterval(next, 3800); };
+    dotBtns.forEach((d, k) => d.addEventListener("click", () => { show(k); restart(); }));
+    show(0); restart();
+  } else {
+    loadModel(opts.model).then(root => { swapModel(root); mount.classList.add("ready"); });
+  }
 }
 
 const hero = document.getElementById("hero3d");
-if (hero) mountViewer(hero, "assets/GLB/cicely-opt-sbf-lavender-tortoise-with-riesling_wide.glb");
+if (hero) mountViewer(hero, { model: "assets/GLB/cicely-opt-sbf-lavender-tortoise-with-riesling_wide.glb" });
+
 const tryon = document.getElementById("tryon3d");
-if (tryon) mountViewer(tryon, "assets/GLB/carson-sun-sbf-chai-crystal-fade_wide.glb");
+if (tryon) {
+  const frames = (window.CATALOG || []).slice(0, 6).map(it => it.colorways[0].model);
+  mountViewer(tryon, { frames, dots: document.getElementById("vpDots") });
+}
