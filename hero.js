@@ -6,16 +6,24 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 
 const loader = new GLTFLoader();
-const cache = new Map();
+const cache = new Map(); // url -> { root (template), size }
+// Return a fresh clone each call: the same frame can appear in two viewers
+// (e.g. Cicely in the hero and the slideshow), and an Object3D has one parent —
+// sharing the instance would yank it out of the other viewer.
+function instance(entry) {
+  const c = entry.root.clone(true);
+  c.userData.size = entry.size;
+  return c;
+}
 function loadModel(url) {
-  if (cache.has(url)) return Promise.resolve(cache.get(url));
+  if (cache.has(url)) return Promise.resolve(instance(cache.get(url)));
   return loader.loadAsync(url).then(gltf => {
     const root = gltf.scene;
     const box = new THREE.Box3().setFromObject(root);
     root.position.sub(box.getCenter(new THREE.Vector3())); // centre on origin
-    root.userData.size = box.getSize(new THREE.Vector3());
-    cache.set(url, root);
-    return root;
+    const entry = { root, size: box.getSize(new THREE.Vector3()) };
+    cache.set(url, entry);
+    return instance(entry);
   });
 }
 

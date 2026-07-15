@@ -86,10 +86,10 @@ function mountNav() {
 }
 
 export const Bag = {
-  add(entry) { // {id, name, price, image, colorway, size}
+  add(entry, silent) { // {id, name, price, image, colorway, size}; silent skips the drawer
     const items = read(), id = lineId(entry), ex = items.find(i => lineId(i) === id);
     if (ex) ex.qty++; else items.push({ ...entry, qty: 1 });
-    write(items); open();
+    write(items); if (!silent) open();
   },
   open, close, count, subtotal, items: read, FREE_SHIP, SHIP_FEE,
   clear() { localStorage.removeItem(KEY); render(); }

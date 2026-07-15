@@ -272,12 +272,17 @@ function retune(patch) {
 /* ---------- Host A: full-screen overlay (home / anywhere) ---------- */
 const el = {};
 function frameList() {
-  return (window.CATALOG || []).map(it => ({
-    id: it.id, name: it.name, price: it.price,
-    model: it.colorways[0].model, image: it.colorways[0].image
-  }));
+  return (window.CATALOG || []).map(it => {
+    const c = it.colorways[0];
+    return {
+      id: it.id, name: it.name, price: it.price, type: it.type, shape: it.shape,
+      rating: it.rating, reviewCount: it.reviewCount,
+      colorway: c.name, size: (c.variants && c.variants[0] ? c.variants[0].size : ""),
+      model: c.model, image: c.image
+    };
+  });
 }
-let ovFrames = [], ovCurrent = 0;
+let ovAll = [], ovFrames = [], ovCurrent = 0, ovType = "all";
 
 function buildOverlay() {
   if (el.root) return;
@@ -299,11 +304,23 @@ function buildOverlay() {
       </div></div>
     </div></div>
     <div class="to-dock">
-      <div class="to-current"><span class="n"></span><span class="p"></span></div>
+      <div class="to-bar">
+        <div class="to-info">
+          <span class="to-eyebrow"></span>
+          <div class="to-nameline"><span class="n"></span><span class="to-cw"></span></div>
+        </div>
+        <div class="to-info2"><span class="to-rating"></span><span class="p"></span></div>
+      </div>
+      <div class="to-filter">
+        <button class="to-chip on" data-f="all">All</button>
+        <button class="to-chip" data-f="eyeglasses">Eyeglasses</button>
+        <button class="to-chip" data-f="sunglasses">Sunglasses</button>
+      </div>
       <div class="to-strip"></div>
       <div class="to-actions">
-        <button class="btn btn-light cap">Capture look</button>
-        <a class="btn btn-ghost shop" style="color:var(--paper);border-color:rgba(246,243,237,.3)" href="shop.html">View in shop</a>
+        <button class="btn btn-light bag">Add to bag</button>
+        <a class="btn btn-ghost view" style="color:var(--paper);border-color:rgba(246,243,237,.3)" href="shop.html">View details</a>
+        <button class="btn btn-ghost cap" style="color:var(--paper);border-color:rgba(246,243,237,.3)">Capture</button>
       </div>
     </div>`;
   document.body.appendChild(root);
@@ -314,18 +331,47 @@ function buildOverlay() {
   el.sMsg = root.querySelector(".s-msg");
   el.sAction = root.querySelector(".s-action");
   el.strip = root.querySelector(".to-strip");
-  el.name = root.querySelector(".to-current .n");
-  el.price = root.querySelector(".to-current .p");
-  el.shop = root.querySelector(".shop");
+  el.eyebrow = root.querySelector(".to-eyebrow");
+  el.name = root.querySelector(".to-info .n");
+  el.cw = root.querySelector(".to-cw");
+  el.rating = root.querySelector(".to-rating");
+  el.price = root.querySelector(".to-info2 .p");
+  el.bag = root.querySelector(".bag");
+  el.viewLink = root.querySelector(".view");
   root.querySelector(".to-close").addEventListener("click", closeOverlay);
   root.querySelector(".cap").addEventListener("click", () => capture(ovFrames[ovCurrent].id));
+  el.bag.addEventListener("click", () => {
+    const f = ovFrames[ovCurrent];
+    window.AetherBag?.add({ id: f.id, name: f.name, price: f.price, image: f.image, colorway: f.colorway, size: f.size }, true);
+    el.bag.textContent = "Added ✓";
+    setTimeout(() => { el.bag.textContent = "Add to bag — $" + ovFrames[ovCurrent].price; }, 1400);
+  });
+  root.querySelectorAll(".to-chip").forEach(c => c.addEventListener("click", () => {
+    root.querySelectorAll(".to-chip").forEach(x => x.classList.toggle("on", x === c));
+    ovFilter(c.dataset.f);
+  }));
   document.addEventListener("keydown", e => { if (e.key === "Escape" && el.root.classList.contains("open")) closeOverlay(); });
+}
+function buildStrip() {
+  el.strip.innerHTML = ovFrames.map((f, i) => `<button class="to-thumb ${i === ovCurrent ? "on" : ""}" data-i="${i}" aria-label="${f.name}"><img src="${f.image}" alt=""></button>`).join("");
+  el.strip.querySelectorAll(".to-thumb").forEach(b => b.addEventListener("click", () => ovSetCurrent(+b.dataset.i)));
+}
+function ovFilter(type) {
+  ovType = type;
+  ovFrames = ovAll.filter(f => type === "all" || f.type === type);
+  ovCurrent = 0; buildStrip();
+  if (ovFrames.length) ovSetCurrent(0);
 }
 function ovStatus(t, m, a) { el.status.classList.remove("hide"); el.sTitle.textContent = t; el.sMsg.textContent = m; el.sAction.innerHTML = a || ""; }
 function ovSetCurrent(i) {
   ovCurrent = i; const f = ovFrames[i];
-  el.name.textContent = f.name; el.price.textContent = "$" + f.price;
-  el.shop.href = "product.html?id=" + encodeURIComponent(f.id);
+  el.eyebrow.textContent = (f.type === "sunglasses" ? "Sunglasses" : "Eyeglasses") + (f.shape ? " · " + f.shape : "");
+  el.name.textContent = f.name;
+  el.cw.textContent = f.colorway;
+  el.rating.innerHTML = f.rating ? `<span class="to-star">★</span> ${f.rating} <span class="to-rc">(${f.reviewCount})</span>` : "";
+  el.price.textContent = "$" + f.price;
+  el.bag.textContent = "Add to bag — $" + f.price;
+  el.viewLink.href = "product.html?id=" + encodeURIComponent(f.id);
   el.strip.querySelectorAll(".to-thumb").forEach((b, k) => b.classList.toggle("on", k === i));
   if (raf) setModel(f.model);
 }
@@ -345,12 +391,12 @@ async function overlayRun() {
 }
 function openOverlay(itemId) {
   buildOverlay();
-  ovFrames = frameList(); if (!ovFrames.length) return;
+  ovAll = frameList(); if (!ovAll.length) return;
+  ovType = "all"; ovFrames = ovAll;
+  el.root.querySelectorAll(".to-chip").forEach(x => x.classList.toggle("on", x.dataset.f === "all"));
+  buildStrip();
   const idx = ovFrames.findIndex(f => f.id === itemId);
-  ovCurrent = idx >= 0 ? idx : 0;
-  el.strip.innerHTML = ovFrames.map((f, i) => `<button class="to-thumb ${i === ovCurrent ? "on" : ""}" data-i="${i}" aria-label="${f.name}"><img src="${f.image}" alt=""></button>`).join("");
-  el.strip.querySelectorAll(".to-thumb").forEach(b => b.addEventListener("click", () => ovSetCurrent(+b.dataset.i)));
-  ovSetCurrent(ovCurrent);
+  ovSetCurrent(idx >= 0 ? idx : 0);
   el.root.classList.add("open");
   document.body.style.overflow = "hidden";
   overlayRun();

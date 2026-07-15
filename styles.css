@@ -431,6 +431,21 @@ section { position: relative; }
 .to-thumb.on { border-color:var(--cognac); background:rgba(154,107,75,.12); }
 .to-thumb img { max-height:100%; width:auto; filter: drop-shadow(0 2px 6px rgba(0,0,0,.4)); }
 .to-actions { display:flex; gap:.7rem; justify-content:center; margin-top:1rem; flex-wrap:wrap; }
+.to-bar { display:flex; justify-content:space-between; align-items:flex-end; gap:1rem; margin-bottom:.85rem; }
+.to-eyebrow { display:block; font-size:.6rem; letter-spacing:.16em; text-transform:uppercase; color:var(--cognac); margin-bottom:.35rem; }
+.to-nameline { display:flex; align-items:baseline; gap:.7rem; flex-wrap:wrap; }
+.to-info .n { font-family:var(--serif); font-size:1.35rem; color:var(--paper); }
+.to-cw { font-size:.85rem; color:rgba(246,243,237,.6); }
+.to-info2 { text-align:right; white-space:nowrap; }
+.to-rating { display:block; font-size:.8rem; color:rgba(246,243,237,.72); margin-bottom:.25rem; }
+.to-star { color:var(--cognac); }
+.to-rc { color:rgba(246,243,237,.4); }
+.to-info2 .p { font-family:var(--serif); font-size:1.25rem; color:var(--paper); }
+.to-filter { display:flex; gap:.5rem; margin-bottom:.85rem; }
+.to-chip { font:600 .74rem var(--sans); padding:.42rem .95rem; border-radius:999px; border:1px solid rgba(246,243,237,.22); background:transparent; color:rgba(246,243,237,.82); cursor:pointer; transition:.2s; }
+.to-chip.on { background:var(--paper); color:var(--espresso); border-color:var(--paper); }
+.to-chip:hover:not(.on) { border-color:var(--paper); }
+@media (max-width:560px){ .to-bar { flex-direction:column; align-items:flex-start; gap:.4rem; } .to-info2 { text-align:left; } }
 
 /* ---- In-place try-on inside the product stage ---- */
 .pdp-stage { transition: background-color .55s ease; overflow:hidden; }
