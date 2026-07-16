@@ -463,6 +463,22 @@ section { position: relative; }
 .to-overlay.room .to-thumb { background:rgba(246,243,237,.1); border-color:rgba(246,243,237,.15); backdrop-filter:blur(6px); }
 .to-overlay.room .to-thumb.on { border-color:var(--cognac); background:rgba(154,107,75,.2); }
 .to-overlay.room .to-actions { margin-top:.7rem; }
+.to-overlay.room .to-roomname { text-decoration:none; }
+.to-overlay.room .to-roomname .rn-cta { display:block; font-size:.66rem; letter-spacing:.14em; text-transform:uppercase; color:var(--cognac); margin-top:.35rem; transition:.2s; }
+.to-overlay.room .to-roomname:hover .rn { text-decoration:underline; text-underline-offset:3px; }
+.to-overlay.room .to-roomname:hover .rn-cta { color:var(--paper); }
+
+/* Wardrobe-door entrance: two panels swing open to reveal the mirror */
+.to-doors { position:absolute; inset:0; z-index:10; perspective:1800px; pointer-events:none; }
+.to-door { position:absolute; top:0; height:100%; width:50%; background:linear-gradient(100deg,#201b16,#2d261e); box-shadow: inset 0 0 90px rgba(0,0,0,.55); backface-visibility:hidden; transition: transform 1s cubic-bezier(.7,.02,.2,1); }
+.to-door.l { left:0; transform-origin:left center; border-right:1px solid rgba(0,0,0,.5); }
+.to-door.r { right:0; transform-origin:right center; border-left:1px solid rgba(0,0,0,.5); }
+.to-door::before { content:''; position:absolute; inset:9% 13%; border:1px solid rgba(154,107,75,.28); border-radius:5px; }
+.to-door::after { content:''; position:absolute; top:50%; width:6px; height:60px; border-radius:3px; background:linear-gradient(var(--cognac),#6b4a33); transform:translateY(-50%); box-shadow:0 2px 8px rgba(0,0,0,.5); }
+.to-door.l::after { right:9%; } .to-door.r::after { left:9%; }
+.to-overlay.doors-parted .to-door.l { transform: rotateY(-115deg); }
+.to-overlay.doors-parted .to-door.r { transform: rotateY(115deg); }
+@media (prefers-reduced-motion: reduce){ .to-door { transition:none; } }
 
 /* ---- In-place try-on inside the product stage ---- */
 .pdp-stage { transition: background-color .55s ease; overflow:hidden; }

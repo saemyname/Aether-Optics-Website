@@ -319,14 +319,15 @@ function buildOverlay() {
         <button class="to-chip" data-f="eyeglasses">Eyeglasses</button>
         <button class="to-chip" data-f="sunglasses">Sunglasses</button>
       </div>
-      <div class="to-roomname"><span class="rn"></span></div>
+      <a class="to-roomname" href="#"><span class="rn"></span><span class="rn-cta">View details →</span></a>
       <div class="to-strip"></div>
       <div class="to-actions">
         <button class="btn btn-light bag">Add to bag</button>
         <a class="btn btn-ghost view" style="color:var(--paper);border-color:rgba(246,243,237,.3)" href="shop.html">View details</a>
         <button class="btn btn-ghost cap" style="color:var(--paper);border-color:rgba(246,243,237,.3)">Capture</button>
       </div>
-    </div>`;
+    </div>
+    <div class="to-doors" aria-hidden="true"><div class="to-door l"></div><div class="to-door r"></div></div>`;
   document.body.appendChild(root);
   el.root = root;
   el.view = root.querySelector(".to-view");
@@ -343,6 +344,7 @@ function buildOverlay() {
   el.bag = root.querySelector(".bag");
   el.viewLink = root.querySelector(".view");
   el.roomName = root.querySelector(".to-roomname .rn");
+  el.roomLink = root.querySelector(".to-roomname");
   const roomBtn = root.querySelector(".to-room");
   roomBtn.addEventListener("click", () => { roomBtn.textContent = el.root.classList.toggle("room") ? "Detailed" : "Room"; });
   root.querySelector(".to-close").addEventListener("click", closeOverlay);
@@ -380,6 +382,7 @@ function ovSetCurrent(i) {
   el.price.textContent = "$" + f.price;
   el.bag.textContent = "Add to bag — $" + f.price;
   el.viewLink.href = "product.html?id=" + encodeURIComponent(f.id);
+  el.roomLink.href = "product.html?id=" + encodeURIComponent(f.id);
   el.strip.querySelectorAll(".to-thumb").forEach((b, k) => b.classList.toggle("on", k === i));
   if (raf) setModel(f.model);
 }
@@ -406,10 +409,12 @@ function openOverlay(itemId) {
   const idx = ovFrames.findIndex(f => f.id === itemId);
   ovSetCurrent(idx >= 0 ? idx : 0);
   el.root.classList.add("open");
+  el.root.classList.remove("doors-parted"); // start closed
+  requestAnimationFrame(() => requestAnimationFrame(() => el.root.classList.add("doors-parted"))); // then swing open
   document.body.style.overflow = "hidden";
   overlayRun();
 }
-function closeOverlay() { stopEngine(); el.root.classList.remove("open"); document.body.style.overflow = ""; }
+function closeOverlay() { stopEngine(); el.root.classList.remove("open", "doors-parted"); document.body.style.overflow = ""; }
 
 /* wire global [data-tryon] triggers (used on home) */
 document.addEventListener("click", e => {
