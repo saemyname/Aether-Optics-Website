@@ -290,7 +290,7 @@ function buildOverlay() {
   root.className = "to-overlay";
   root.innerHTML = `
     <div class="to-top">
-      <span class="brand">Aether <b>Optics</b></span>
+      <span class="brand">Aether Optics</span>
       <div class="to-title">Virtual Try-On<small>Live camera · 3D</small></div>
       <div class="to-topbtns">
         <button class="to-room" aria-label="Toggle try-on room">Room</button>
