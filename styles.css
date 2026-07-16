@@ -233,8 +233,9 @@ section { position: relative; }
 .csw:hover { transform:scale(1.12); }
 .csw.on { box-shadow:0 0 0 2px var(--paper), 0 0 0 4px var(--cognac); }
 .sort-select { font-family:var(--sans); font-weight:500; font-size:.82rem; color:var(--ink); padding:.5rem 2.1rem .5rem 1rem; border:1px solid var(--hairline); border-radius:999px; background-color:transparent; cursor:pointer; -webkit-appearance:none; appearance:none; background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6'><path d='M1 1l4 4 4-4' stroke='%238B8279' fill='none' stroke-width='1.4' stroke-linecap='round'/></svg>"); background-repeat:no-repeat; background-position:right .85rem center; }
-.applied { display:flex; gap:.5rem; flex-wrap:wrap; margin:1.4rem 0 0; }
+.applied { display:flex; gap:.5rem; flex-wrap:wrap; margin:1.6rem 0 -0.6rem; }
 .applied:empty { margin:0; }
+.grid.shop { margin-top:2.4rem; }
 .applied-chip { display:inline-flex; align-items:center; gap:.45rem; font-size:.76rem; padding:.34rem .5rem .34rem .8rem; border-radius:999px; background:var(--paper-warm); border:1px solid var(--hairline); color:var(--ink); cursor:pointer; transition:.2s; }
 .applied-chip:hover { border-color:var(--ink); }
 .applied-chip .x { display:inline-grid; place-items:center; width:15px; height:15px; border-radius:50%; background:var(--ink); color:var(--paper); font-size:.58rem; line-height:1; }
