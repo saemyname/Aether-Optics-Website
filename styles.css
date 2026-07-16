@@ -140,7 +140,7 @@ section { position: relative; }
 /* ============================================================
    Home — hero
    ============================================================ */
-.hero { padding: clamp(3rem, 7vw, 6rem) 0 clamp(3.5rem, 7vw, 6rem); }
+.hero { padding-top: clamp(3rem, 7vw, 6rem); padding-bottom: clamp(3.5rem, 7vw, 6rem); }
 .hero-grid { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 3rem; align-items: center; }
 .hero-copy .eyebrow { display:block; margin-bottom: 1.4rem; }
 .hero-copy .display { margin-bottom: 1.6rem; }
@@ -172,7 +172,7 @@ section { position: relative; }
 @keyframes floaty { 0%,100%{ transform: translateY(-8px);} 50%{ transform: translateY(8px);} }
 
 /* ---- Full-height sections + scroll snap ---- */
-.snap { min-height: 100vh; scroll-snap-align: start; display: flex; flex-direction: column; justify-content: center; }
+.snap { min-height: 100vh; min-height: 100svh; scroll-snap-align: start; display: flex; flex-direction: column; justify-content: center; }
 .footer { scroll-snap-align: start; }
 
 /* ---- Try-on signature ---- */
@@ -321,7 +321,7 @@ section { position: relative; }
 .rating-badge:hover { color:var(--ink); }
 .card-rating { display:inline-flex; align-items:center; gap:.35rem; font-size:.76rem; color:var(--stone); margin-top:.55rem; }
 .card-rating .stars { font-size:.72rem; }
-.pdp-reviews { padding:clamp(3rem,6vw,5rem) 0; border-top:1px solid var(--hairline); }
+.pdp-reviews { padding-top:clamp(3rem,6vw,5rem); padding-bottom:clamp(3rem,6vw,5rem); border-top:1px solid var(--hairline); }
 .reviews-summary { display:flex; align-items:center; gap:1rem; }
 .reviews-summary .big { font-family:var(--serif); font-size:2.4rem; line-height:1; }
 .reviews-summary .stars { font-size:1.05rem; }
@@ -336,7 +336,7 @@ section { position: relative; }
 @media (max-width:820px){ .reviews-grid { grid-template-columns:1fr; } }
 
 /* ---- Story ---- */
-.story { padding: clamp(4rem,8vw,7rem) 0; }
+.story { padding-top: clamp(4rem,8vw,7rem); padding-bottom: clamp(4rem,8vw,7rem); }
 .story-grid { display:grid; grid-template-columns: 1fr 1fr; gap: 3.5rem; align-items:center; }
 .story .display { font-size: clamp(2.2rem,5vw,3.8rem); margin-bottom: 1.6rem; }
 .story-cols { columns: 2; column-gap: 2rem; color: var(--stone); font-size:.98rem; }
@@ -365,7 +365,7 @@ section { position: relative; }
 /* ============================================================
    Product detail
    ============================================================ */
-.pdp { padding: clamp(2rem,4vw,3.5rem) 0 2rem; }
+.pdp { padding-top: clamp(2rem,4vw,3.5rem); padding-bottom: 2rem; }
 .pdp-grid { display:grid; grid-template-columns: 1.05fr 0.95fr; gap: clamp(2rem,5vw,4.5rem); align-items:start; }
 .pdp-stage { position: sticky; top: 90px; background: var(--paper-warm); border-radius: 22px; aspect-ratio: 4/3; display:grid; place-items:center; padding: clamp(1.5rem,4vw,3rem); }
 .pdp-stage img { width: 92%; filter: drop-shadow(0 20px 40px rgba(28,25,23,.16)); }
@@ -394,7 +394,7 @@ section { position: relative; }
 .detail-list { list-style:none; padding:0; margin:0; }
 .detail-list li { display:flex; justify-content:space-between; padding:.8rem 0; border-bottom:1px solid var(--hairline); font-size:.92rem; }
 .detail-list .k { color:var(--stone); }
-.pdp-related { padding: clamp(3rem,6vw,5rem) 0; }
+.pdp-related { padding-top: clamp(3rem,6vw,5rem); padding-bottom: clamp(3rem,6vw,5rem); }
 @media (max-width: 900px){ .pdp-grid{ grid-template-columns:1fr; } .pdp-stage{ position:static; } }
 
 /* ============================================================

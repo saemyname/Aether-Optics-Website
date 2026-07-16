@@ -7,7 +7,7 @@
 <meta name="description" content="Shop Aether NY eyeglasses and sunglasses. Handmade acetate frames, try them on in AR before you buy.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="styles.css?v=13">
+<link rel="stylesheet" href="styles.css?v=14">
 <script type="importmap">
 {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}
 </script>
@@ -16,7 +16,7 @@
 <header class="nav">
   <a class="brand" href="index.html">Aether <b>NY</b></a>
   <nav class="nav-links">
-    <a href="shop.html" class="active">Eyeglasses</a>
+    <a href="shop.html#eye" class="active">Eyeglasses</a>
     <a href="shop.html#sun">Sunglasses</a>
     <a href="index.html#tryon">Virtual Try-On</a>
     <a href="index.html#story">Our Story</a>
@@ -167,12 +167,16 @@
   });
   document.querySelector('#clearAll').addEventListener('click', clearAll);
 
-  // deep-link #sun → sunglasses
-  if (location.hash === '#sun') {
-    state.type = 'sunglasses';
-    document.querySelectorAll('#fType .chip').forEach(x => x.classList.toggle('on', x.dataset.v === 'sunglasses'));
+  // deep-links: #sun → sunglasses, #eye → eyeglasses (also on in-page hash changes
+  // — clicking the nav while already on this page only fires hashchange)
+  function applyHash() {
+    const t = location.hash === '#sun' ? 'sunglasses' : location.hash === '#eye' ? 'eyeglasses' : 'all';
+    state.type = t;
+    document.querySelectorAll('#fType .chip').forEach(x => x.classList.toggle('on', x.dataset.v === t));
+    render();
   }
-  render();
+  window.addEventListener('hashchange', applyHash);
+  applyHash();
 })();
 </script>
 <script type="module" src="tryon.js?v=6"></script>
