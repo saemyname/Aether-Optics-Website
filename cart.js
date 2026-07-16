@@ -79,7 +79,7 @@ function mountNav() {
     if (cta.querySelector(".nav-bag")) return;
     const b = document.createElement("button");
     b.className = "nav-bag"; b.setAttribute("aria-label", "Open bag");
-    b.innerHTML = `Bag <span class="nav-bag-count"></span>`;
+    b.innerHTML = `<svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 8h15l-1.1 13h-12.8z"/><path d="M8.5 8V6.5a3.5 3.5 0 0 1 7 0V8" stroke-linecap="round"/></svg><span class="nav-bag-count"></span>`;
     b.addEventListener("click", open);
     cta.insertBefore(b, cta.firstChild);
   });

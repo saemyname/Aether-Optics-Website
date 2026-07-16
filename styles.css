@@ -243,9 +243,10 @@ section { position: relative; }
 .no-results { color:var(--stone); padding:3rem 0; font-size:.98rem; }
 
 /* ---- Shopping bag: nav button + slide-out drawer ---- */
-.nav-bag { background:none; border:0; font:600 .84rem var(--sans); color:var(--ink); cursor:pointer; display:inline-flex; align-items:center; gap:.4rem; padding:0; }
+.nav-bag { position:relative; background:none; border:0; color:var(--ink); cursor:pointer; display:inline-flex; align-items:center; padding:.2rem; }
 .nav-bag:hover { color:var(--cognac); }
-.nav-bag-count { min-width:18px; height:18px; padding:0 5px; border-radius:999px; background:var(--ink); color:var(--paper); font-size:.66rem; font-weight:700; display:none; place-items:center; }
+.nav-bag svg { display:block; }
+.nav-bag-count { position:absolute; top:-4px; right:-7px; min-width:16px; height:16px; padding:0 4px; border-radius:999px; background:var(--cognac); color:var(--paper); font:700 .62rem/1 var(--sans); display:none; place-items:center; box-shadow:0 0 0 2px var(--paper); }
 .nav-bag-count.has { display:inline-grid; }
 .bag-drawer { position:fixed; inset:0; z-index:300; visibility:hidden; }
 .bag-drawer.open { visibility:visible; }
