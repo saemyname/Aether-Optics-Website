@@ -28,7 +28,8 @@ function loadModel(url) {
 }
 
 function mountViewer(mount, opts) {
-  const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+  // preserveDrawingBuffer lets the page-split transition copy these pixels
+  const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, preserveDrawingBuffer: true });
   renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;

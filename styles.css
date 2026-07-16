@@ -468,17 +468,20 @@ section { position: relative; }
 .to-overlay.room .to-roomname:hover .rn { text-decoration:underline; text-underline-offset:3px; }
 .to-overlay.room .to-roomname:hover .rn-cta { color:var(--paper); }
 
-/* Wardrobe-door entrance: two panels swing open to reveal the mirror */
-.to-doors { position:absolute; inset:0; z-index:10; perspective:1800px; pointer-events:none; }
-.to-door { position:absolute; top:0; height:100%; width:50%; background:linear-gradient(100deg,#201b16,#2d261e); box-shadow: inset 0 0 90px rgba(0,0,0,.55); backface-visibility:hidden; transition: transform 1s cubic-bezier(.7,.02,.2,1); }
-.to-door.l { left:0; transform-origin:left center; border-right:1px solid rgba(0,0,0,.5); }
-.to-door.r { right:0; transform-origin:right center; border-left:1px solid rgba(0,0,0,.5); }
-.to-door::before { content:''; position:absolute; inset:9% 13%; border:1px solid rgba(154,107,75,.28); border-radius:5px; }
-.to-door::after { content:''; position:absolute; top:50%; width:6px; height:60px; border-radius:3px; background:linear-gradient(var(--cognac),#6b4a33); transform:translateY(-50%); box-shadow:0 2px 8px rgba(0,0,0,.5); }
-.to-door.l::after { right:9%; } .to-door.r::after { left:9%; }
-.to-overlay.doors-parted .to-door.l { transform: rotateY(-115deg); }
-.to-overlay.doors-parted .to-door.r { transform: rotateY(115deg); }
-@media (prefers-reduced-motion: reduce){ .to-door { transition:none; } }
+/* Entrance: the page you're looking at splits down the middle and swings open */
+.to-doors { position:absolute; inset:0; z-index:10; perspective:2200px; pointer-events:none; }
+.to-door { position:absolute; top:0; height:100%; width:50%; overflow:hidden; background:var(--paper); backface-visibility:hidden; transition: transform 1.05s cubic-bezier(.65,.02,.2,1); }
+.to-door.l { left:0; transform-origin:left center; }
+.to-door.r { right:0; transform-origin:right center; }
+.to-door-inner { position:absolute; top:0; left:0; width:100vw; height:100vh; }
+.to-door.r .to-door-inner { left:-100%; }
+.to-door::after { content:''; position:absolute; inset:0; pointer-events:none; transition:opacity 1.05s ease; opacity:0; }
+.to-door.l::after { background:linear-gradient(90deg, transparent 60%, rgba(21,17,14,.5)); }
+.to-door.r::after { background:linear-gradient(270deg, transparent 60%, rgba(21,17,14,.5)); }
+.to-overlay.doors-parted .to-door::after { opacity:1; } /* inner edges fall into shadow as they swing */
+.to-overlay.doors-parted .to-door.l { transform: rotateY(-108deg); }
+.to-overlay.doors-parted .to-door.r { transform: rotateY(108deg); }
+@media (prefers-reduced-motion: reduce){ .to-door, .to-door::after { transition:none; } }
 
 /* ---- In-place try-on inside the product stage ---- */
 .pdp-stage { transition: background-color .55s ease; overflow:hidden; }

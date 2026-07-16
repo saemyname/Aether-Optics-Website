@@ -327,7 +327,10 @@ function buildOverlay() {
         <button class="btn btn-ghost cap" style="color:var(--paper);border-color:rgba(246,243,237,.3)">Capture</button>
       </div>
     </div>
-    <div class="to-doors" aria-hidden="true"><div class="to-door l"></div><div class="to-door r"></div></div>`;
+    <div class="to-doors" aria-hidden="true">
+      <div class="to-door l"><div class="to-door-inner"></div></div>
+      <div class="to-door r"><div class="to-door-inner"></div></div>
+    </div>`;
   document.body.appendChild(root);
   el.root = root;
   el.view = root.querySelector(".to-view");
@@ -361,6 +364,31 @@ function buildOverlay() {
   }));
   document.addEventListener("keydown", e => { if (e.key === "Escape" && el.root.classList.contains("open")) closeOverlay(); });
 }
+/* Snapshot the live page into the two door panels, so the split starts out
+   looking exactly like what you were just looking at, then swings open. */
+function fillDoors() {
+  const y = window.scrollY;
+  el.root.querySelectorAll(".to-door-inner").forEach(inner => {
+    inner.innerHTML = "";
+    const wrap = document.createElement("div");
+    wrap.style.cssText = `position:absolute;top:0;left:0;width:100vw;transform:translateY(${-y}px)`;
+    [...document.body.children].forEach(n => {
+      if (n.classList && (n.classList.contains("to-overlay") || n.classList.contains("bag-drawer"))) return;
+      wrap.appendChild(n.cloneNode(true));
+    });
+    // clones don't carry canvas pixels — copy them across so the 3D frames survive
+    const src = [...document.body.querySelectorAll("canvas")].filter(c => !c.closest(".to-overlay"));
+    const dst = [...wrap.querySelectorAll("canvas")];
+    src.forEach((s, i) => {
+      const d = dst[i]; if (!d || !s.width) return;
+      d.width = s.width; d.height = s.height;
+      try { d.getContext("2d").drawImage(s, 0, 0); } catch (e) {}
+    });
+    inner.appendChild(wrap);
+  });
+}
+function clearDoors() { el.root.querySelectorAll(".to-door-inner").forEach(i => (i.innerHTML = "")); }
+
 function buildStrip() {
   el.strip.innerHTML = ovFrames.map((f, i) => `<button class="to-thumb ${i === ovCurrent ? "on" : ""}" data-i="${i}" aria-label="${f.name}"><img src="${f.image}" alt=""></button>`).join("");
   el.strip.querySelectorAll(".to-thumb").forEach(b => b.addEventListener("click", () => ovSetCurrent(+b.dataset.i)));
@@ -408,13 +436,20 @@ function openOverlay(itemId) {
   buildStrip();
   const idx = ovFrames.findIndex(f => f.id === itemId);
   ovSetCurrent(idx >= 0 ? idx : 0);
-  el.root.classList.add("open");
-  el.root.classList.remove("doors-parted"); // start closed
+  fillDoors();                                   // doors show the page you're on
+  el.root.classList.add("open", "room");         // the fitting room is the way in
+  el.root.classList.remove("doors-parted");      // start closed
+  el.root.querySelector(".to-room").textContent = "Detailed";
   requestAnimationFrame(() => requestAnimationFrame(() => el.root.classList.add("doors-parted"))); // then swing open
   document.body.style.overflow = "hidden";
   overlayRun();
 }
-function closeOverlay() { stopEngine(); el.root.classList.remove("open", "doors-parted"); document.body.style.overflow = ""; }
+function closeOverlay() {
+  stopEngine();
+  el.root.classList.remove("open", "doors-parted");
+  clearDoors();
+  document.body.style.overflow = "";
+}
 
 /* wire global [data-tryon] triggers (used on home) */
 document.addEventListener("click", e => {
