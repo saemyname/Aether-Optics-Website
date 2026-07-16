@@ -2,7 +2,7 @@ window.CATALOG = [
   {
     "id": "blakeley-opt",
     "name": "Blakeley",
-    "brand": "Aether NY",
+    "brand": "Aether Optics",
     "price": 135,
     "description": "A soft-curved cat-eye frame with a classic silhouette that's easy to wear every day.",
     "type": "eyeglasses",
@@ -62,7 +62,7 @@ window.CATALOG = [
   {
     "id": "brimmer-sun",
     "name": "Brimmer Sun",
-    "brand": "Aether NY",
+    "brand": "Aether Optics",
     "price": 160,
     "description": "A square sunglasses frame with a striking blue tone, perfect for summer daily wear.",
     "type": "sunglasses",
@@ -118,7 +118,7 @@ window.CATALOG = [
   {
     "id": "carlton-opt",
     "name": "Carlton",
-    "brand": "Aether NY",
+    "brand": "Aether Optics",
     "price": 135,
     "description": "A square frame in a soft green hue, recommended for anyone looking for a distinctive statement piece.",
     "type": "eyeglasses",
@@ -174,7 +174,7 @@ window.CATALOG = [
   {
     "id": "carson-opt",
     "name": "Carson",
-    "brand": "Aether NY",
+    "brand": "Aether Optics",
     "price": 110,
     "description": "A universally flattering square frame and a great-value pair of daily glasses.",
     "type": "eyeglasses",
@@ -244,7 +244,7 @@ window.CATALOG = [
   {
     "id": "carson-sun",
     "name": "Carson Sun",
-    "brand": "Aether NY",
+    "brand": "Aether Optics",
     "price": 145,
     "description": "The sunglasses version of Carson, combining UV protection with everyday style.",
     "type": "sunglasses",
@@ -314,7 +314,7 @@ window.CATALOG = [
   {
     "id": "cicely-opt",
     "name": "Cicely",
-    "brand": "Aether NY",
+    "brand": "Aether Optics",
     "price": 170,
     "description": "A cat-eye frame with added metal detailing for an elegant yet distinctive impression.",
     "type": "eyeglasses",
@@ -384,7 +384,7 @@ window.CATALOG = [
   {
     "id": "cicely-sun",
     "name": "Cicely Sun",
-    "brand": "Aether NY",
+    "brand": "Aether Optics",
     "price": 190,
     "description": "The sunglasses version of Cicely, showcasing a cat-eye silhouette with striking metal detailing.",
     "type": "sunglasses",
@@ -454,7 +454,7 @@ window.CATALOG = [
   {
     "id": "claude-opt",
     "name": "Claude",
-    "brand": "Aether NY",
+    "brand": "Aether Optics",
     "price": 150,
     "description": "A round frame with slim metal detailing and a vintage-inspired charm.",
     "type": "eyeglasses",
@@ -524,7 +524,7 @@ window.CATALOG = [
   {
     "id": "claude-sun",
     "name": "Claude Sun",
-    "brand": "Aether NY",
+    "brand": "Aether Optics",
     "price": 170,
     "description": "The sunglasses version of Claude, sunglasses with a vintage-inspired round silhouette.",
     "type": "sunglasses",
@@ -594,7 +594,7 @@ window.CATALOG = [
   {
     "id": "hector-opt",
     "name": "Hector",
-    "brand": "Aether NY",
+    "brand": "Aether Optics",
     "price": 120,
     "description": "A square frame in matte blue that gives off a calm yet polished impression.",
     "type": "eyeglasses",
@@ -650,7 +650,7 @@ window.CATALOG = [
   {
     "id": "ketty-opt",
     "name": "Ketty",
-    "brand": "Aether NY",
+    "brand": "Aether Optics",
     "price": 140,
     "description": "A rounded, soft-edged frame that adds a gentle touch to everyday glasses.",
     "type": "eyeglasses",
@@ -720,7 +720,7 @@ window.CATALOG = [
   {
     "id": "rosie-sun",
     "name": "Rosie Sun",
-    "brand": "Aether NY",
+    "brand": "Aether Optics",
     "price": 155,
     "description": "Sunglasses with a round silhouette and a classic yet feminine mood.",
     "type": "sunglasses",
@@ -776,7 +776,7 @@ window.CATALOG = [
   {
     "id": "winston-opt",
     "name": "Winston",
-    "brand": "Aether NY",
+    "brand": "Aether Optics",
     "price": 130,
     "description": "A substantial round frame that completes a classic, intellectual look.",
     "type": "eyeglasses",

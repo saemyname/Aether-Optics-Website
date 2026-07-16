@@ -1,4 +1,4 @@
-/* Aether NY — reusable 3D frame viewer. The hero lens circle shows one frame;
+/* Aether Optics — reusable 3D frame viewer. The hero lens circle shows one frame;
    the try-on viewport runs a scanline wipe: as the cognac line sweeps up, the
    next frame is revealed below it (two models split by a moving clip plane).
    Studio "lightbox" lighting bakes crisp reflections onto the acetate & metal. */

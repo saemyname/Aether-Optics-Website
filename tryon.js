@@ -1,4 +1,4 @@
-/* Aether NY — live 3D virtual try-on.
+/* Aether Optics — live 3D virtual try-on.
    MediaPipe FaceLandmarker gives a 6DoF head-pose matrix; three.js renders the
    real glasses GLB onto the face over the webcam feed. One shared engine drives
    both hosts: the full-screen overlay (home) and the in-place product stage. */
@@ -290,7 +290,7 @@ function buildOverlay() {
   root.className = "to-overlay";
   root.innerHTML = `
     <div class="to-top">
-      <span class="brand">Aether <b>NY</b></span>
+      <span class="brand">Aether <b>Optics</b></span>
       <div class="to-title">Virtual Try-On<small>Live camera · 3D</small></div>
       <div class="to-topbtns">
         <button class="to-room" aria-label="Toggle try-on room">Room</button>

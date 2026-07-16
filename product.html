@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Frame — Aether NY</title>
+<title>Frame — Aether Optics</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="styles.css?v=14">
@@ -13,7 +13,7 @@
 </head>
 <body>
 <header class="nav">
-  <a class="brand" href="index.html">Aether <b>NY</b></a>
+  <a class="brand" href="index.html">Aether <b>Optics</b></a>
   <nav class="nav-links">
     <a href="shop.html#eye">Eyeglasses</a>
     <a href="shop.html#sun">Sunglasses</a>
@@ -40,21 +40,21 @@
 
 <footer class="footer">
   <div class="wrap">
-    <p class="eyebrow" style="color:var(--cognac);margin-bottom:1.2rem">Aether NY</p>
+    <p class="eyebrow" style="color:var(--cognac);margin-bottom:1.2rem">Aether Optics</p>
     <p class="display">See them<br>on <em>you.</em></p>
-    <div class="footer-fine" style="margin-top:2.5rem"><span>© 2026 Aether NY. A portfolio concept.</span><span><a href="shop.html">Shop all frames →</a></span></div>
+    <div class="footer-fine" style="margin-top:2.5rem"><span>© 2026 Aether Optics. A portfolio concept.</span><span><a href="shop.html">Shop all frames →</a></span></div>
   </div>
 </footer>
 
-<script src="data.js?v=1"></script>
-<script src="main.js?v=2"></script>
+<script src="data.js?v=2"></script>
+<script src="main.js?v=3"></script>
 <script>
 (function () {
   const id = new URLSearchParams(location.search).get('id');
   const item = (window.CATALOG || []).find(i => i.id === id) || (window.CATALOG || [])[0];
   const pdp = document.querySelector('#pdp');
   if (!item) { pdp.innerHTML = '<p class="lede">Frame not found. <a class="link-arrow" href="shop.html">Back to shop →</a></p>'; return; }
-  document.title = item.name + ' — Aether NY';
+  document.title = item.name + ' — Aether Optics';
   const s = item.sizes || {};
   const typeLabel = item.type === 'sunglasses' ? 'Sunglasses' : 'Eyeglasses';
   const cwButtons = item.colorways.map((c, k) =>
@@ -206,7 +206,7 @@
   }
 })();
 </script>
-<script type="module" src="tryon.js?v=6"></script>
-<script type="module" src="cart.js?v=1"></script>
+<script type="module" src="tryon.js?v=7"></script>
+<script type="module" src="cart.js?v=2"></script>
 </body>
 </html>

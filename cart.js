@@ -1,4 +1,4 @@
-/* Aether NY — shopping bag: localStorage state + slide-out drawer, shared
+/* Aether Optics — shopping bag: localStorage state + slide-out drawer, shared
    across every page. A concept store, so checkout is a demo (no payment). */
 const KEY = "aether-bag";
 export const FREE_SHIP = 200, SHIP_FEE = 15;
