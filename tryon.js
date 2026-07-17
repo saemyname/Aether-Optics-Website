@@ -21,11 +21,11 @@ const TUNE = {
   widthK: 1.5, ox: 0, oy: 0, oz: 0.6,
   templeSplayBase: 0.26, templeSplayK: 1, templeSign: 1, templeSplayMax: 0.9,
   templeFadeStart: -0.045, templeFadeEnd: -0.12,
-  // Head occluder: an invisible depth-only ellipsoid stands in for the skull so
-  // glasses parts behind the head (the far temple when you turn) are hidden.
-  // Radii are × half the measured face width; occBack is how far (cm) the
-  // ellipsoid's front face sits behind the nose bridge.
-  occW: 0.98, occH: 1.45, occD: 1.3, occBack: 1.8
+  // Face occluder (like the iOS app): MediaPipe's canonical face mesh, posed by
+  // the head matrix, rendered depth-only — the far temple hides behind the face.
+  // occScale pads the mesh a touch; occBack (cm) sinks it so it can't eat the
+  // frame front or nose pads.
+  occScale: 1.03, occBack: 0.4
 };
 const BRIDGE = 168, R_EYE = 33, L_EYE = 263, R_TEMPLE = 234, L_TEMPLE = 454;
 
@@ -36,7 +36,7 @@ let currentWidth = 0.134, currentDepth = 0.135, currentRef = 0.134, currentHinge
 const modelCache = new Map();
 const refWidth = new Map(); // frame stem -> reference width, so size variants scale proportionally
 const stemOf = url => url.replace(/_(narrow|medium|wide)\.glb$/i, "");
-const _m = new THREE.Matrix4(), _p = new THREE.Vector3(), _q = new THREE.Quaternion(), _s = new THREE.Vector3();
+const _m = new THREE.Matrix4(), _m2 = new THREE.Matrix4(), _p = new THREE.Vector3(), _q = new THREE.Quaternion(), _s = new THREE.Vector3();
 const _pos = new THREE.Vector3(), _e1 = new THREE.Vector3(), _e2 = new THREE.Vector3(), _off = new THREE.Vector3();
 const _t1 = new THREE.Vector3(), _t2 = new THREE.Vector3();
 
@@ -89,15 +89,24 @@ function ensureThree() {
   cam.updateMatrixWorld();
   const glassesRoot = new THREE.Group(); glassesRoot.visible = false; scene.add(glassesRoot);
 
-  // Depth-only head stand-in: writes depth, draws no colour, renders before the
-  // glasses — anything behind it (the far temple) is occluded, video shows through.
+  // Depth-only face stand-in (canonical face mesh): writes depth, draws no
+  // colour, renders before the glasses — anything behind the face (the far
+  // temple when you turn) is occluded and the video shows through.
   const occluder = new THREE.Mesh(
-    new THREE.SphereGeometry(1, 36, 24),
+    new THREE.BufferGeometry(),
     new THREE.MeshBasicMaterial({ colorWrite: false })
   );
+  occluder.matrixAutoUpdate = false;
+  occluder.frustumCulled = false;
   occluder.renderOrder = -10;
   occluder.visible = false;
   scene.add(occluder);
+  fetch("assets/face-occluder.json").then(r => r.json()).then(d => {
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute("position", new THREE.BufferAttribute(new Float32Array(d.positions), 3));
+    geo.setIndex(d.indices);
+    occluder.geometry = geo;
+  }).catch(() => {});
 
   three = { renderer, canvas, video, videoTex, bgScene, bgCam, scene, cam, glassesRoot, occluder, loader: new GLTFLoader() };
   return three;
@@ -190,13 +199,12 @@ function placeGlasses(lm, mtxData) {
   toWorld(lm[L_TEMPLE].x, lm[L_TEMPLE].y, _t2);
   const faceW = _t1.distanceTo(_t2);
 
-  // Head occluder: ellipsoid sized to the face, its front face occBack cm
-  // behind the bridge so the frame front and lenses stay unoccluded.
-  const o = t.occluder, hw = faceW / 2;
-  o.scale.set(hw * TUNE.occW, hw * TUNE.occH, hw * TUNE.occD);
-  o.quaternion.copy(_q);
-  _off.set(0, 0, -(TUNE.occBack + hw * TUNE.occD)).applyQuaternion(_q);
-  o.position.copy(_pos).add(_off);
+  // Face occluder: the head matrix maps the canonical face mesh straight onto
+  // the face; pad it slightly and sink it occBack cm so the frame stays clear.
+  const o = t.occluder;
+  o.matrix.fromArray(mtxData);
+  o.matrix.multiply(_m2.makeTranslation(0, 0, -TUNE.occBack));
+  o.matrix.multiply(_m2.makeScale(TUNE.occScale, TUNE.occScale, TUNE.occScale));
 
   // Splay the temple arms outward to the head width so they hug the sides of
   // the face instead of clipping through it (real hinges opening wider).
