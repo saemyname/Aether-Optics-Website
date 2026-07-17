@@ -25,7 +25,7 @@ const TUNE = {
   // landmarks — the user's actual detected face, not a scaled average — and
   // rendered depth-only so the far temple hides behind it. occOZ (cm) sinks the
   // surface slightly so the frame front and nose pads stay clear.
-  occOZ: -0.5
+  occOZ: -0.3
 };
 const BRIDGE = 168, R_EYE = 33, L_EYE = 263, R_TEMPLE = 234, L_TEMPLE = 454;
 
