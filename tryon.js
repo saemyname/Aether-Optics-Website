@@ -44,7 +44,7 @@ const modelCache = new Map();
 const refWidth = new Map(); // frame stem -> reference width, so size variants scale proportionally
 const stemOf = url => url.replace(/_(narrow|medium|wide)\.glb$/i, "");
 const _m = new THREE.Matrix4(), _p = new THREE.Vector3(), _q = new THREE.Quaternion(), _s = new THREE.Vector3();
-const _pos = new THREE.Vector3(), _e1 = new THREE.Vector3(), _e2 = new THREE.Vector3(), _off = new THREE.Vector3();
+const _pos = new THREE.Vector3(), _e1 = new THREE.Vector3(), _e2 = new THREE.Vector3(), _off = new THREE.Vector3(), _xa = new THREE.Vector3();
 const _t1 = new THREE.Vector3(), _t2 = new THREE.Vector3();
 
 async function ensureModel() {
@@ -195,9 +195,14 @@ function placeGlasses(lm, mtxData) {
   toWorld(lm[BRIDGE].x, lm[BRIDGE].y, _pos);
   toWorld(lm[R_EYE].x, lm[R_EYE].y, _e1);
   toWorld(lm[L_EYE].x, lm[L_EYE].y, _e2);
+  // Yaw foreshortens the projected eye span (the glasses would shrink as you
+  // turn — iOS never had this because ARKit's pose is metric, not measured).
+  // Undo it: divide by the on-screen length of the head's sideways axis.
+  _xa.set(1, 0, 0).applyQuaternion(_q);
+  const fore = Math.max(0.35, Math.hypot(_xa.x, _xa.y));
   // scale on the frame's shared reference width so different sizes render at
   // their true relative size (medium wider than narrow), not all normalised.
-  const scale = (_e1.distanceTo(_e2) * TUNE.widthK) / currentRef;
+  const scale = (_e1.distanceTo(_e2) / fore * TUNE.widthK) / currentRef;
   const g = t.glassesRoot;
   g.quaternion.copy(_q);
   g.scale.setScalar(scale);
@@ -206,7 +211,7 @@ function placeGlasses(lm, mtxData) {
 
   toWorld(lm[R_TEMPLE].x, lm[R_TEMPLE].y, _t1);
   toWorld(lm[L_TEMPLE].x, lm[L_TEMPLE].y, _t2);
-  const faceW = _t1.distanceTo(_t2);
+  const faceW = _t1.distanceTo(_t2) / fore; // same foreshortening correction
 
   // Face occluder: rebuild the mask from the live landmarks so it IS the
   // detected face — exact width and outline, expressions included — projected
