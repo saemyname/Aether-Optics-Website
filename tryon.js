@@ -21,11 +21,11 @@ const TUNE = {
   widthK: 1.5, ox: 0, oy: 0, oz: 0.6,
   templeSplayBase: 0.26, templeSplayK: 1, templeSign: 1, templeSplayMax: 0.9,
   templeFadeStart: -0.045, templeFadeEnd: -0.12,
-  // Face occluder (like the iOS app): MediaPipe's canonical face mesh, anchored
-  // like the glasses, rendered depth-only — the far temple hides behind the
-  // face. occScale pads the mesh; occOX/OY/OZ nudge it in head-local cm
-  // (negative Z sinks it into the face so the frame front stays clear).
-  occScale: 1.03, occWide: 1.12, occOX: 0, occOY: 0, occOZ: -0.2
+  // Face occluder (like the iOS app): rebuilt every frame from the LIVE
+  // landmarks — the user's actual detected face, not a scaled average — and
+  // rendered depth-only so the far temple hides behind it. occOZ (cm) sinks the
+  // surface slightly so the frame front and nose pads stay clear.
+  occOZ: -0.15
 };
 const BRIDGE = 168, R_EYE = 33, L_EYE = 263, R_TEMPLE = 234, L_TEMPLE = 454;
 
@@ -33,7 +33,13 @@ const BRIDGE = 168, R_EYE = 33, L_EYE = 263, R_TEMPLE = 234, L_TEMPLE = 454;
 let landmarker = null, stream = null, raf = null, lastTs = -1;
 let three = null, mountEl = null, currentModelUrl = null;
 let currentWidth = 0.134, currentDepth = 0.135, currentRef = 0.134, currentHinges = [];
-let occAnchor = null; // canonical-mesh eye span + bridge vertex, set when the occluder loads
+// contour rings around the face mesh's eye/mouth holes — their centroids are
+// the 3 extra vertices (indices 468..470) that seal the holes
+const OCC_RINGS = [
+  [33,7,163,144,145,153,154,155,133,173,157,158,159,160,161,246],
+  [263,249,390,373,374,380,381,382,362,398,384,385,386,387,388,466],
+  [78,95,88,178,87,14,317,402,318,324,308,415,310,311,312,13,82,81,80,191]
+];
 const modelCache = new Map();
 const refWidth = new Map(); // frame stem -> reference width, so size variants scale proportionally
 const stemOf = url => url.replace(/_(narrow|medium|wide)\.glb$/i, "");
@@ -102,13 +108,12 @@ function ensureThree() {
   occluder.renderOrder = -10;
   occluder.visible = false;
   scene.add(occluder);
+  // only the triangulation comes from the file — vertex positions are rebuilt
+  // from the live landmarks every frame
   fetch("assets/face-occluder.json?v=2").then(r => r.json()).then(d => {
     const geo = new THREE.BufferGeometry();
-    geo.setAttribute("position", new THREE.BufferAttribute(new Float32Array(d.positions), 3));
+    geo.setAttribute("position", new THREE.BufferAttribute(new Float32Array(d.positions.length), 3));
     geo.setIndex(d.indices);
-    // canonical mesh vertices ARE the landmarks — record the anchors we place by
-    const v = i => new THREE.Vector3(d.positions[i * 3], d.positions[i * 3 + 1], d.positions[i * 3 + 2]);
-    occAnchor = { eyeW: v(R_EYE).distanceTo(v(L_EYE)), templeW: v(R_TEMPLE).distanceTo(v(L_TEMPLE)), bridge: v(BRIDGE) };
     occluder.geometry = geo;
   }).catch(() => {});
 
@@ -203,21 +208,29 @@ function placeGlasses(lm, mtxData) {
   toWorld(lm[L_TEMPLE].x, lm[L_TEMPLE].y, _t2);
   const faceW = _t1.distanceTo(_t2);
 
-  // Face occluder: anchor the canonical face mesh exactly the way the glasses
-  // are anchored — scaled to the measured eye span, bridge vertex pinned to the
-  // same nose-bridge point — so both live at the same depth. occBack sinks it
-  // slightly so the frame front and nose pads stay clear.
-  if (occAnchor) {
-    const o = t.occluder;
-    const os = (_e1.distanceTo(_e2) / occAnchor.eyeW) * TUNE.occScale;
-    // widen the mask past the canonical face so the splayed temple arms fall
-    // inside its silhouette (occWide is the straightforward width multiplier)
-    const ox = os * TUNE.occWide;
-    _off.set(-occAnchor.bridge.x * ox, -occAnchor.bridge.y * os, -occAnchor.bridge.z * os);
-    _off.x += TUNE.occOX; _off.y += TUNE.occOY; _off.z += TUNE.occOZ;
-    _off.applyQuaternion(_q).add(_pos);
-    _s.set(ox, os, os);
-    o.matrix.compose(_off, _q, _s);
+  // Face occluder: rebuild the mask from the live landmarks so it IS the
+  // detected face — exact width and outline, expressions included — projected
+  // with the same camera maths that places the glasses.
+  const attr = t.occluder.geometry.attributes.position;
+  if (attr) {
+    const tanY = Math.tan(cam.fov * Math.PI / 360), tanX = tanY * cam.aspect;
+    const zSpan = 2 * tanX * -depth; // landmark z is normalised like x — this is that span in world cm
+    const a = attr.array;
+    for (let i = 0; i < 468; i++) {
+      const L = lm[i];
+      const zi = depth - L.z * zSpan + TUNE.occOZ;
+      a[i * 3] = (L.x * 2 - 1) * tanX * -zi;
+      a[i * 3 + 1] = -(L.y * 2 - 1) * tanY * -zi;
+      a[i * 3 + 2] = zi;
+    }
+    for (let r = 0; r < OCC_RINGS.length; r++) {
+      const ring = OCC_RINGS[r];
+      let cx = 0, cy = 0, cz = 0;
+      for (const k of ring) { cx += a[k * 3]; cy += a[k * 3 + 1]; cz += a[k * 3 + 2]; }
+      const o = (468 + r) * 3, n = ring.length;
+      a[o] = cx / n; a[o + 1] = cy / n; a[o + 2] = cz / n;
+    }
+    attr.needsUpdate = true;
   }
 
   // Splay the temple arms outward to the head width so they hug the sides of
