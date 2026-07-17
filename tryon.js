@@ -25,7 +25,7 @@ const TUNE = {
   // like the glasses, rendered depth-only — the far temple hides behind the
   // face. occScale pads the mesh; occOX/OY/OZ nudge it in head-local cm
   // (negative Z sinks it into the face so the frame front stays clear).
-  occScale: 1.03, occOX: 0, occOY: 0, occOZ: -0.4
+  occScale: 1.03, occOX: 0, occOY: 0, occOZ: -0.2
 };
 const BRIDGE = 168, R_EYE = 33, L_EYE = 263, R_TEMPLE = 234, L_TEMPLE = 454;
 
