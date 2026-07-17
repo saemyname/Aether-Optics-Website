@@ -18,14 +18,14 @@ const MODEL = "https://storage.googleapis.com/mediapipe-models/face_landmarker/f
    (opaque, front) to End (transparent, ear), fading into the head like iOS. */
 const TUNE = {
   fovY: 63, near: 1, far: 2000, exposure: 1.3, envIntensity: 1.6,
-  widthK: 1.5, ox: 0, oy: 0, oz: 0.6,
+  widthK: 1.5, ox: 0, oy: 0, oz: 1.3,
   templeSplayBase: 0.26, templeSplayK: 1, templeSign: 1, templeSplayMax: 0.9,
   templeFadeStart: -0.045, templeFadeEnd: -0.12,
   // Face occluder (like the iOS app): rebuilt every frame from the LIVE
   // landmarks — the user's actual detected face, not a scaled average — and
   // rendered depth-only so the far temple hides behind it. occOZ (cm) sinks the
   // surface slightly so the frame front and nose pads stay clear.
-  occOZ: -0.15
+  occOZ: -0.5
 };
 const BRIDGE = 168, R_EYE = 33, L_EYE = 263, R_TEMPLE = 234, L_TEMPLE = 454;
 
