@@ -19,8 +19,8 @@ const MODEL = "https://storage.googleapis.com/mediapipe-models/face_landmarker/f
 const TUNE = {
   fovY: 63, near: 1, far: 2000, exposure: 1.3, envIntensity: 1.6,
   widthK: 1.5, ox: 0, oy: 0, oz: 1.3,
-  templeSplayBase: 0.26, templeSplayK: 1, templeSign: 1, templeSplayMax: 0.9,
-  templeFadeStart: -0.045, templeFadeEnd: -0.12,
+  templeSplayBase: 0.34, templeSplayK: 1, templeSign: 1, templeSplayMax: 0.9,
+  templeFadeStart: -0.03, templeFadeEnd: -0.095,
   // Face occluder (like the iOS app): rebuilt every frame from the LIVE
   // landmarks — the user's actual detected face, not a scaled average — and
   // rendered depth-only so the far temple hides behind it. occOZ (cm) sinks the
