@@ -25,7 +25,7 @@ const TUNE = {
   // like the glasses, rendered depth-only — the far temple hides behind the
   // face. occScale pads the mesh; occOX/OY/OZ nudge it in head-local cm
   // (negative Z sinks it into the face so the frame front stays clear).
-  occScale: 1.03, occOX: 0, occOY: 0, occOZ: -0.2
+  occScale: 1.03, occWide: 1.04, occOX: 0, occOY: 0, occOZ: -0.2
 };
 const BRIDGE = 168, R_EYE = 33, L_EYE = 263, R_TEMPLE = 234, L_TEMPLE = 454;
 
@@ -108,7 +108,7 @@ function ensureThree() {
     geo.setIndex(d.indices);
     // canonical mesh vertices ARE the landmarks — record the anchors we place by
     const v = i => new THREE.Vector3(d.positions[i * 3], d.positions[i * 3 + 1], d.positions[i * 3 + 2]);
-    occAnchor = { eyeW: v(R_EYE).distanceTo(v(L_EYE)), bridge: v(BRIDGE) };
+    occAnchor = { eyeW: v(R_EYE).distanceTo(v(L_EYE)), templeW: v(R_TEMPLE).distanceTo(v(L_TEMPLE)), bridge: v(BRIDGE) };
     occluder.geometry = geo;
   }).catch(() => {});
 
@@ -210,10 +210,13 @@ function placeGlasses(lm, mtxData) {
   if (occAnchor) {
     const o = t.occluder;
     const os = (_e1.distanceTo(_e2) / occAnchor.eyeW) * TUNE.occScale;
-    _off.copy(occAnchor.bridge).multiplyScalar(-os);
+    // width matched to the measured face span — the same span the temples splay
+    // to — so the splayed arms fall inside the mask, not past its silhouette
+    const ox = (faceW / occAnchor.templeW) * TUNE.occScale * TUNE.occWide;
+    _off.set(-occAnchor.bridge.x * ox, -occAnchor.bridge.y * os, -occAnchor.bridge.z * os);
     _off.x += TUNE.occOX; _off.y += TUNE.occOY; _off.z += TUNE.occOZ;
     _off.applyQuaternion(_q).add(_pos);
-    _s.set(os, os, os);
+    _s.set(ox, os, os);
     o.matrix.compose(_off, _q, _s);
   }
 
