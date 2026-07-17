@@ -95,14 +95,14 @@ function ensureThree() {
   // temple when you turn) is occluded and the video shows through.
   const occluder = new THREE.Mesh(
     new THREE.BufferGeometry(),
-    new THREE.MeshBasicMaterial({ colorWrite: false })
+    new THREE.MeshBasicMaterial({ colorWrite: false, side: THREE.DoubleSide })
   );
   occluder.matrixAutoUpdate = false;
   occluder.frustumCulled = false;
   occluder.renderOrder = -10;
   occluder.visible = false;
   scene.add(occluder);
-  fetch("assets/face-occluder.json").then(r => r.json()).then(d => {
+  fetch("assets/face-occluder.json?v=2").then(r => r.json()).then(d => {
     const geo = new THREE.BufferGeometry();
     geo.setAttribute("position", new THREE.BufferAttribute(new Float32Array(d.positions), 3));
     geo.setIndex(d.indices);
