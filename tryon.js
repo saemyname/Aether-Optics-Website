@@ -19,8 +19,8 @@ const MODEL = "https://storage.googleapis.com/mediapipe-models/face_landmarker/f
 const TUNE = {
   fovY: 63, near: 1, far: 2000, exposure: 1.3, envIntensity: 1.6,
   widthK: 1.5, ox: 0, oy: 0, oz: 1.3,
-  templeSplayBase: 0.34, templeSplayK: 1, templeSign: 1, templeSplayMax: 0.9,
-  templeFadeStart: -0.03, templeFadeEnd: -0.095,
+  templeSplayBase: 0.3, templeSplayK: 1, templeSign: 1, templeSplayMax: 0.9,
+  templeFadeStart: -0.045, templeFadeEnd: -0.12,
   // Face occluder (like the iOS app): rebuilt every frame from the LIVE
   // landmarks — the user's actual detected face, not a scaled average — and
   // rendered depth-only so the far temple hides behind it. occOZ (cm) sinks the
@@ -32,7 +32,7 @@ const BRIDGE = 168, R_EYE = 33, L_EYE = 263, R_TEMPLE = 234, L_TEMPLE = 454;
 /* ---------- shared engine ---------- */
 let landmarker = null, stream = null, raf = null, lastTs = -1;
 let three = null, mountEl = null, currentModelUrl = null;
-let currentWidth = 0.134, currentDepth = 0.135, currentRef = 0.134, currentHinges = [];
+let currentWidth = 0.134, currentDepth = 0.135, currentRef = 0.134, currentHinges = [], currentArms = [];
 // contour rings around the face mesh's eye/mouth holes — their centroids are
 // the 3 extra vertices (indices 468..470) that seal the holes
 const OCC_RINGS = [
@@ -161,11 +161,18 @@ async function loadModel(url) {
       hinges.push({ node: o, baseY: o.rotation.y, side: Math.sign(wx) || 1 });
     }
   });
+  // per-side arm materials (clones, thanks to the fade) so occlusion can be
+  // switched per arm depending on which way the head is turned
+  const armMats = hinges.map(h => {
+    const mats = [];
+    h.node.traverse(o => { if (o.isMesh) (Array.isArray(o.material) ? o.material : [o.material]).forEach(m => mats.push(m)); });
+    return { side: h.side, mats };
+  });
   const box = new THREE.Box3().setFromObject(root);
   const width = box.max.x - box.min.x;
   const stem = stemOf(url);
   if (!refWidth.has(stem)) refWidth.set(stem, width); // first-loaded variant anchors the frame's scale
-  const entry = { root, width, depth: box.max.z - box.min.z, hinges, stem };
+  const entry = { root, width, depth: box.max.z - box.min.z, hinges, armMats, stem };
   modelCache.set(url, entry);
   return entry;
 }
@@ -179,6 +186,7 @@ async function setModel(url) {
   while (g.children.length) g.remove(g.children[0]);
   g.add(entry.root);
   currentWidth = entry.width; currentDepth = entry.depth; currentHinges = entry.hinges;
+  currentArms = entry.armMats;
   currentRef = refWidth.get(entry.stem) || entry.width; // shared across a frame's sizes
 }
 
@@ -200,6 +208,17 @@ function placeGlasses(lm, mtxData) {
   // Undo it: divide by the on-screen length of the head's sideways axis.
   _xa.set(1, 0, 0).applyQuaternion(_q);
   const fore = Math.max(0.35, Math.hypot(_xa.x, _xa.y));
+
+  // Deterministic per-side occlusion (the iOS result despite web imprecision):
+  // the arm on the far side of the turn is depth-cut by the face mask; the
+  // near arm is exempt — its fade alone makes it vanish. Depth precision at
+  // the grazing near side is ~noise, so we decide by turn direction instead.
+  const turned = Math.abs(_xa.z) > 0.06;
+  const farSide = _xa.z > 0 ? -1 : 1;
+  for (const arm of currentArms) {
+    const occludable = turned && arm.side === farSide;
+    for (const m of arm.mats) m.depthTest = occludable;
+  }
   // scale on the frame's shared reference width so different sizes render at
   // their true relative size (medium wider than narrow), not all normalised.
   const scale = (_e1.distanceTo(_e2) / fore * TUNE.widthK) / currentRef;
