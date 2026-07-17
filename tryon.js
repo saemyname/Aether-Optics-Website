@@ -20,7 +20,12 @@ const TUNE = {
   fovY: 63, near: 1, far: 2000, exposure: 1.3, envIntensity: 1.6,
   widthK: 1.5, ox: 0, oy: 0, oz: 0.6,
   templeSplayBase: 0.26, templeSplayK: 1, templeSign: 1, templeSplayMax: 0.9,
-  templeFadeStart: -0.045, templeFadeEnd: -0.12
+  templeFadeStart: -0.045, templeFadeEnd: -0.12,
+  // Head occluder: an invisible depth-only ellipsoid stands in for the skull so
+  // glasses parts behind the head (the far temple when you turn) are hidden.
+  // Radii are × half the measured face width; occBack is how far (cm) the
+  // ellipsoid's front face sits behind the nose bridge.
+  occW: 0.98, occH: 1.45, occD: 1.3, occBack: 1.8
 };
 const BRIDGE = 168, R_EYE = 33, L_EYE = 263, R_TEMPLE = 234, L_TEMPLE = 454;
 
@@ -84,7 +89,17 @@ function ensureThree() {
   cam.updateMatrixWorld();
   const glassesRoot = new THREE.Group(); glassesRoot.visible = false; scene.add(glassesRoot);
 
-  three = { renderer, canvas, video, videoTex, bgScene, bgCam, scene, cam, glassesRoot, loader: new GLTFLoader() };
+  // Depth-only head stand-in: writes depth, draws no colour, renders before the
+  // glasses — anything behind it (the far temple) is occluded, video shows through.
+  const occluder = new THREE.Mesh(
+    new THREE.SphereGeometry(1, 36, 24),
+    new THREE.MeshBasicMaterial({ colorWrite: false })
+  );
+  occluder.renderOrder = -10;
+  occluder.visible = false;
+  scene.add(occluder);
+
+  three = { renderer, canvas, video, videoTex, bgScene, bgCam, scene, cam, glassesRoot, occluder, loader: new GLTFLoader() };
   return three;
 }
 
@@ -171,12 +186,22 @@ function placeGlasses(lm, mtxData) {
   _off.set(TUNE.ox, TUNE.oy, TUNE.oz).applyQuaternion(_q);
   g.position.copy(_pos).add(_off);
 
+  toWorld(lm[R_TEMPLE].x, lm[R_TEMPLE].y, _t1);
+  toWorld(lm[L_TEMPLE].x, lm[L_TEMPLE].y, _t2);
+  const faceW = _t1.distanceTo(_t2);
+
+  // Head occluder: ellipsoid sized to the face, its front face occBack cm
+  // behind the bridge so the frame front and lenses stay unoccluded.
+  const o = t.occluder, hw = faceW / 2;
+  o.scale.set(hw * TUNE.occW, hw * TUNE.occH, hw * TUNE.occD);
+  o.quaternion.copy(_q);
+  _off.set(0, 0, -(TUNE.occBack + hw * TUNE.occD)).applyQuaternion(_q);
+  o.position.copy(_pos).add(_off);
+
   // Splay the temple arms outward to the head width so they hug the sides of
   // the face instead of clipping through it (real hinges opening wider).
   if (currentHinges.length) {
-    toWorld(lm[R_TEMPLE].x, lm[R_TEMPLE].y, _t1);
-    toWorld(lm[L_TEMPLE].x, lm[L_TEMPLE].y, _t2);
-    const faceW = _t1.distanceTo(_t2), frameW = currentWidth * scale, templeLen = currentDepth * scale;
+    const frameW = currentWidth * scale, templeLen = currentDepth * scale;
     let splay = TUNE.templeSplayBase; // always open past rest so the arms clear the face
     if (faceW > frameW && templeLen > 0) splay += Math.asin(Math.min(1, (faceW - frameW) / 2 / templeLen));
     splay = Math.min(splay, TUNE.templeSplayMax) * TUNE.templeSplayK;
@@ -211,8 +236,8 @@ function loop() {
       try { r = landmarker.detectForVideo(v, ts); } catch (e) {}
       const lm = r && r.faceLandmarks && r.faceLandmarks[0];
       const mtx = r && r.facialTransformationMatrixes && r.facialTransformationMatrixes[0];
-      if (lm && mtx) { placeGlasses(lm, mtx.data); t.glassesRoot.visible = true; }
-      else { t.glassesRoot.visible = false; }
+      if (lm && mtx) { placeGlasses(lm, mtx.data); t.glassesRoot.visible = true; t.occluder.visible = true; }
+      else { t.glassesRoot.visible = false; t.occluder.visible = false; }
     }
     t.videoTex.needsUpdate = true;
   }
@@ -246,6 +271,7 @@ function stopEngine() {
     if (three.canvas.parentNode) three.canvas.parentNode.removeChild(three.canvas);
     three.video.srcObject = null;
     three.glassesRoot.visible = false;
+    three.occluder.visible = false;
   }
   mountEl = null; lastTs = -1;
 }
