@@ -33,10 +33,11 @@ const BRIDGE = 168, R_EYE = 33, L_EYE = 263, R_TEMPLE = 234, L_TEMPLE = 454;
 let landmarker = null, stream = null, raf = null, lastTs = -1;
 let three = null, mountEl = null, currentModelUrl = null;
 let currentWidth = 0.134, currentDepth = 0.135, currentRef = 0.134, currentHinges = [];
+let occAnchor = null; // canonical-mesh eye span + bridge vertex, set when the occluder loads
 const modelCache = new Map();
 const refWidth = new Map(); // frame stem -> reference width, so size variants scale proportionally
 const stemOf = url => url.replace(/_(narrow|medium|wide)\.glb$/i, "");
-const _m = new THREE.Matrix4(), _m2 = new THREE.Matrix4(), _p = new THREE.Vector3(), _q = new THREE.Quaternion(), _s = new THREE.Vector3();
+const _m = new THREE.Matrix4(), _p = new THREE.Vector3(), _q = new THREE.Quaternion(), _s = new THREE.Vector3();
 const _pos = new THREE.Vector3(), _e1 = new THREE.Vector3(), _e2 = new THREE.Vector3(), _off = new THREE.Vector3();
 const _t1 = new THREE.Vector3(), _t2 = new THREE.Vector3();
 
@@ -105,6 +106,9 @@ function ensureThree() {
     const geo = new THREE.BufferGeometry();
     geo.setAttribute("position", new THREE.BufferAttribute(new Float32Array(d.positions), 3));
     geo.setIndex(d.indices);
+    // canonical mesh vertices ARE the landmarks — record the anchors we place by
+    const v = i => new THREE.Vector3(d.positions[i * 3], d.positions[i * 3 + 1], d.positions[i * 3 + 2]);
+    occAnchor = { eyeW: v(R_EYE).distanceTo(v(L_EYE)), bridge: v(BRIDGE) };
     occluder.geometry = geo;
   }).catch(() => {});
 
@@ -199,12 +203,19 @@ function placeGlasses(lm, mtxData) {
   toWorld(lm[L_TEMPLE].x, lm[L_TEMPLE].y, _t2);
   const faceW = _t1.distanceTo(_t2);
 
-  // Face occluder: the head matrix maps the canonical face mesh straight onto
-  // the face; pad it slightly and sink it occBack cm so the frame stays clear.
-  const o = t.occluder;
-  o.matrix.fromArray(mtxData);
-  o.matrix.multiply(_m2.makeTranslation(0, 0, -TUNE.occBack));
-  o.matrix.multiply(_m2.makeScale(TUNE.occScale, TUNE.occScale, TUNE.occScale));
+  // Face occluder: anchor the canonical face mesh exactly the way the glasses
+  // are anchored — scaled to the measured eye span, bridge vertex pinned to the
+  // same nose-bridge point — so both live at the same depth. occBack sinks it
+  // slightly so the frame front and nose pads stay clear.
+  if (occAnchor) {
+    const o = t.occluder;
+    const os = (_e1.distanceTo(_e2) / occAnchor.eyeW) * TUNE.occScale;
+    _off.copy(occAnchor.bridge).multiplyScalar(-os);
+    _off.z -= TUNE.occBack;
+    _off.applyQuaternion(_q).add(_pos);
+    _s.set(os, os, os);
+    o.matrix.compose(_off, _q, _s);
+  }
 
   // Splay the temple arms outward to the head width so they hug the sides of
   // the face instead of clipping through it (real hinges opening wider).
