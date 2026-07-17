@@ -21,11 +21,11 @@ const TUNE = {
   widthK: 1.5, ox: 0, oy: 0, oz: 0.6,
   templeSplayBase: 0.26, templeSplayK: 1, templeSign: 1, templeSplayMax: 0.9,
   templeFadeStart: -0.045, templeFadeEnd: -0.12,
-  // Face occluder (like the iOS app): MediaPipe's canonical face mesh, posed by
-  // the head matrix, rendered depth-only — the far temple hides behind the face.
-  // occScale pads the mesh a touch; occBack (cm) sinks it so it can't eat the
-  // frame front or nose pads.
-  occScale: 1.03, occBack: 0.4
+  // Face occluder (like the iOS app): MediaPipe's canonical face mesh, anchored
+  // like the glasses, rendered depth-only — the far temple hides behind the
+  // face. occScale pads the mesh; occOX/OY/OZ nudge it in head-local cm
+  // (negative Z sinks it into the face so the frame front stays clear).
+  occScale: 1.03, occOX: 0, occOY: 0, occOZ: -0.4
 };
 const BRIDGE = 168, R_EYE = 33, L_EYE = 263, R_TEMPLE = 234, L_TEMPLE = 454;
 
@@ -211,7 +211,7 @@ function placeGlasses(lm, mtxData) {
     const o = t.occluder;
     const os = (_e1.distanceTo(_e2) / occAnchor.eyeW) * TUNE.occScale;
     _off.copy(occAnchor.bridge).multiplyScalar(-os);
-    _off.z -= TUNE.occBack;
+    _off.x += TUNE.occOX; _off.y += TUNE.occOY; _off.z += TUNE.occOZ;
     _off.applyQuaternion(_q).add(_pos);
     _s.set(os, os, os);
     o.matrix.compose(_off, _q, _s);
@@ -301,6 +301,19 @@ function capture(name) {
   a.href = three.renderer.domElement.toDataURL("image/png");
   a.download = "aether-tryon-" + (name || "look") + ".png";
   a.click();
+}
+
+/* Debug: paint the (normally invisible) face occluder translucent green so its
+   alignment with the real face can be seen and tuned. debugOcc(false) restores
+   the depth-only mask. */
+function debugOcc(on) {
+  const m = ensureThree().occluder.material;
+  m.colorWrite = !!on;
+  m.transparent = true;
+  m.opacity = 0.45;
+  m.color.set(0x33cc66);
+  m.needsUpdate = true;
+  return on ? "occluder visible (green)" : "occluder hidden (depth-only)";
 }
 
 /* Live-tuning helper (console): AetherTryOn.engine.retune({widthK:1.6, oy:0.3})
@@ -507,6 +520,6 @@ document.addEventListener("click", e => {
 /* Public API: full-screen for home, engine for the product in-place stage. */
 window.AetherTryOn = {
   open: openOverlay,
-  engine: { start: startEngine, setModel, stop: stopEngine, capture, ensureModel, retune },
+  engine: { start: startEngine, setModel, stop: stopEngine, capture, ensureModel, retune, debugOcc },
   debug: { three: () => three, hinges: () => currentHinges, TUNE }
 };
